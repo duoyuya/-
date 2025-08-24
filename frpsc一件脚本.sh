@@ -1,7 +1,3 @@
-#!/bin/bash
-# 北沐科技 FRP一键管理脚本 v9.99.99
-# 功能：FRPS/FRPC安装、配置管理、端口管理、开机自启、彻底卸载
-
 # 颜色输出函数
 red() { printf "\033[31m%s\033[0m\n" "$1"; }
 green() { printf "\033[32m%s\033[0m\n" "$1"; }
@@ -69,7 +65,9 @@ find_frp_install_path() {
 show_menu() {
     clear
     blue "=============================="
-    blue " 北沐科技 FRP一键管理脚本 v7.8.3"
+    blue " 北沐科技 FRP一键管理脚本 v9.9.9"
+    blue "       北沐科技 免费分享"
+    blue "          加油奥利给"
     blue "==============================="
     echo "1. ⚙️ 安装 FRP 服务端（frps）"
     echo "2. ⚙️ 安装 FRP 客户端（frpc）"
