@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecurePass - 高级密码加密工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#10b981',
+                        accent: '#f59e0b',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'bounce-gentle': 'bounceGentle 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'spin-slow': 'spin 2s linear infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .card-shadow {
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounceGentle {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
+            to { box-shadow: 0 0 30px rgba(37, 99, 235, 0.8), 0 0 40px rgba(37, 99, 235, 0.3); }
+        }
+        
+        .password-strength-bar {
+            height: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        
+        .input-focus:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+        
+        .btn-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-hover:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg font-inter overflow-x-hidden">
+    <!-- 背景装饰 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <!-- 卡片容器 -->
+        <div class="w-full max-w-md">
+            <!-- 标题区域 -->
+            <div class="text-center mb-8 animate-fade-in">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4 backdrop-blur-sm">
+                    <i class="fa fa-shield text-white text-2xl"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-2">SecurePass</h1>
+                <p class="text-white/80 text-lg">高级密码加密工具</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-secondary to-accent mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <!-- 加密卡片 -->
+            <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 card-shadow animate-slide-up">
+                <form id="encryptionForm" class="space-y-6">
+                    <!-- ENCRYPTION_KEY输入 -->
+                    <div class="space-y-3">
+                        <label class="flex items-center text-white/90 font-medium">
+                            <i class="fa fa-key mr-3 text-accent"></i>
+                            加密密钥 (ENCRYPTION_KEY)
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="encryptionKey" 
+                                placeholder="请输入加密密钥" 
+                                required
+                                class="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 input-focus backdrop-blur-sm"
+                            >
+                            <button type="button" onclick="togglePassword('encryptionKey')" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors">
+                                <i class="fa fa-eye-slash" id="toggleKeyIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 明文密码输入 -->
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between text-white/90 font-medium">
+                            <div class="flex items-center">
+                                <i class="fa fa-lock mr-3 text-secondary"></i>
+                                明文密码
+                            </div>
+                            <span id="passwordStrengthText" class="text-xs text-white/60">密码强度</span>
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="rawPassword" 
+                                placeholder="请输入要加密的密码" 
+                                required
+                                oninput="checkPasswordStrength(this.value)"
+                                class="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 input-focus backdrop-blur-sm"
+                            >
+                            <button type="button" onclick="togglePassword('rawPassword')" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors">
+                                <i class="fa fa-eye-slash" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                        <!-- 密码强度条 -->
+                        <div class="w-full bg-white/10 rounded-full h-1">
+                            <div id="passwordStrengthBar" class="password-strength-bar bg-gray-400 rounded-full w-0"></div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="flex space-x-4">
+                        <button 
+                            type="button" 
+                            onclick="clearForm()"
+                            class="flex-1 px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white hover:bg-white/20 transition-all duration-300 btn-hover"
+                        >
+                            <i class="fa fa-bullseye mr-2"></i>
+                            清空
+                        </button>
+                        <button 
+                            type="submit" 
+                            id="encryptBtn"
+                            class="flex-1 px-6 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-medium btn-hover animate-glow"
+                        >
+                            <i class="fa fa-magic mr-2"></i>
+                            <span id="encryptBtnText">加密</span>
+                            <i class="fa fa-spinner fa-spin ml-2 hidden" id="loadingSpinner"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- 结果显示区域 -->
+                <div id="resultContainer" class="mt-8 space-y-4 hidden">
+                    <div class="flex items-center justify-between text-white/90 font-medium mb-3">
+                        <span><i class="fa fa-code mr-2 text-accent"></i>加密结果</span>
+                        <span class="text-xs text-white/60" id="resultTime"></span>
+                    </div>
+                    <div class="relative">
+                        <div id="result" class="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white/90 font-mono text-sm break-all cursor-pointer hover:bg-white/10 transition-colors" onclick="copyToClipboard()"></div>
+                        <button onclick="copyToClipboard()" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-primary/20 hover:bg-primary/40 rounded-full flex items-center justify-center text-primary transition-colors">
+                            <i class="fa fa-copy text-sm"></i>
+                        </button>
+                    </div>
+                    <div id="copySuccess" class="text-center text-secondary font-medium hidden">
+                        <i class="fa fa-check-circle mr-2"></i>
+                        已成功复制到剪贴板！
+                    </div>
+                </div>
+            </div>
+
+            <!-- 信息卡片 -->
+            <div class="mt-6 bg-white/10 backdrop-blur-md rounded-2xl p-6 text-center animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="flex items-center justify-center mb-3">
+                    <i class="fa fa-info-circle text-accent mr-2"></i>
+                    <span class="text-white/90 font-medium">加密算法</span>
+                </div>
+                <p class="text-white/70 text-sm leading-relaxed">
+                    使用 PBKDF2-SHA256 算法进行加密<br>
+                    迭代次数: 100,000 | 密钥长度: 32 bytes<br>
+                    自动生成随机盐值，确保每次加密结果唯一
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ITERATIONS = 100000;
+        const SALT_LEN = 16;
+        const KEY_LEN = 32;
+        const encoder = new TextEncoder();
+
+        // 生成随机盐
+        function generateSalt() {
+            const salt = new Uint8Array(SALT_LEN);
+            window.crypto.getRandomValues(salt);
+            return salt;
+        }
+
+        // PBKDF2核心逻辑
+        async function pbkdf2(password, salt) {
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                encoder.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits']
+            );
+            
+            const derivedBits = await window.crypto.subtle.deriveBits(
+                { name: 'PBKDF2', salt: salt, iterations: ITERATIONS, hash: 'SHA-256' },
+                keyMaterial,
+                KEY_LEN * 8
+            );
+            
+            return new Uint8Array(derivedBits);
+        }
+
+        // 原生Base64编码
+        function nativeBase64(bytes) {
+            return btoa(String.fromCharCode(...bytes));
+        }
+
+        // 检查密码强度
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            let strengthText = '弱';
+            let strengthColor = 'bg-red-500';
+
+            if (password.length >= 8) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^A-Za-z0-9]/)) strength++;
+
+            const percentage = (strength / 4) * 100;
+
+            switch(strength) {
+                case 1:
+                    strengthText = '弱';
+                    strengthColor = 'bg-red-500';
+                    break;
+                case 2:
+                    strengthText = '中';
+                    strengthColor = 'bg-yellow-500';
+                    break;
+                case 3:
+                    strengthText = '强';
+                    strengthColor = 'bg-blue-500';
+                    break;
+                case 4:
+                    strengthText = '很强';
+                    strengthColor = 'bg-green-500';
+                    break;
+                default:
+                    strengthText = '密码强度';
+                    strengthColor = 'bg-gray-400';
+            }
+
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthTextEl = document.getElementById('passwordStrengthText');
+            
+            strengthBar.className = `password-strength-bar ${strengthColor} rounded-full`;
+            strengthBar.style.width = password ? `${percentage}%` : '0%';
+            strengthTextEl.textContent = password ? strengthText : '密码强度';
+        }
+
+        // 切换密码显示/隐藏
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(`toggle${fieldId.charAt(0).toUpperCase() + fieldId.slice(1)}Icon`);
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.className = 'fa fa-eye';
+            } else {
+                field.type = 'password';
+                icon.className = 'fa fa-eye-slash';
+            }
+        }
+
+        // 清空表单
+        function clearForm() {
+            document.getElementById('encryptionKey').value = '';
+            document.getElementById('rawPassword').value = '';
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('copySuccess').classList.add('hidden');
+            checkPasswordStrength('');
+            
+            // 添加清空动画
+            const form = document.getElementById('encryptionForm');
+            form.classList.add('animate-bounce-gentle');
+            setTimeout(() => form.classList.remove('animate-bounce-gentle'), 600);
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard() {
+            const result = document.getElementById('result').textContent;
+            navigator.clipboard.writeText(result).then(() => {
+                const copySuccess = document.getElementById('copySuccess');
+                copySuccess.classList.remove('hidden');
+                copySuccess.classList.add('animate-bounce-gentle');
+                
+                setTimeout(() => {
+                    copySuccess.classList.add('hidden');
+                    copySuccess.classList.remove('animate-bounce-gentle');
+                }, 2000);
+            });
+        }
+
+        // 主加密函数
+        async function encrypt() {
+            const encryptionKey = document.getElementById('encryptionKey').value.trim();
+            const password = document.getElementById('rawPassword').value.trim();
+
+            // 输入校验
+            if (!encryptionKey) {
+                showNotification('请输入加密密钥', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showNotification('请输入要加密的密码', 'error');
+                return;
+            }
+
+            // 显示加载状态
+            const encryptBtn = document.getElementById('encryptBtn');
+            const encryptBtnText = document.getElementById('encryptBtnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            encryptBtn.disabled = true;
+            encryptBtnText.textContent = '加密中';
+            loadingSpinner.classList.remove('hidden');
+
+            try {
+                const startTime = performance.now();
+                
+                // 执行加密
+                const salt = generateSalt();
+                const key = await pbkdf2(password, salt);
+                const combined = new Uint8Array(salt.length + key.length);
+                combined.set(salt, 0);
+                combined.set(key, salt.length);
+                const base64Str = nativeBase64(combined);
+                const finalResult = `pbkdf2_sha256:${ITERATIONS}:${base64Str}`;
+                
+                const endTime = performance.now();
+                const duration = Math.round((endTime - startTime) * 10) / 10;
+
+                // 显示结果
+                const resultContainer = document.getElementById('resultContainer');
+                const result = document.getElementById('result');
+                const resultTime = document.getElementById('resultTime');
+                
+                result.textContent = finalResult;
+                resultTime.textContent = `耗时: ${duration}ms`;
+                resultContainer.classList.remove('hidden');
+                resultContainer.classList.add('animate-fade-in');
+
+                // 自动复制
+                await navigator.clipboard.writeText(finalResult);
+                showNotification('加密成功！结果已自动复制', 'success');
+
+            } catch (error) {
+                console.error('加密失败:', error);
+                showNotification('加密失败，请使用现代浏览器重试', 'error');
+            } finally {
+                // 恢复按钮状态
+                encryptBtn.disabled = false;
+                encryptBtnText.textContent = '加密';
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 transform translate-x-full transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                'bg-blue-500'
+            }`;
+            
+            notification.innerHTML = `
+                <i class="fa fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle mr-2"></i>
+                ${message}
+            `;
+
+            document.body.appendChild(notification);
+
+            // 显示动画
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // 自动隐藏
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // 表单提交处理
+        document.getElementById('encryptionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await encrypt();
+        });
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 添加输入框聚焦效果
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.parentElement.classList.add('animate-bounce-gentle');
+                });
+                
+                input.addEventListener('blur', () => {
+                    input.parentElement.classList.remove('animate-bounce-gentle');
+                });
+            });
+
+            // 欢迎动画
+            setTimeout(() => {
+                showNotification('欢迎使用 SecurePass 加密工具', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
