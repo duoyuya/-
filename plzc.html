@@ -21,69 +21,113 @@
         }
     </script>
     <style>
+        /* 全局样式优化 */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            overflow-x: hidden; /* 防止水平滚动条 */
+        }
+        
+        /* 自定义滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #2563EB 0%, #059669 100%);
+        }
+        
+        /* 页面容器 - 增加内边距防止内容紧贴边缘 */
+        .page-container {
+            max-width: 7xl;
+            margin: 0 auto;
+            padding: 1rem;
         }
         
         .card {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden; /* 防止内容溢出 */
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
         }
         
         .btn-primary {
             background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
             color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
         }
         
         .btn-secondary {
             background: white;
             color: #3B82F6;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
             border: 2px solid #3B82F6;
             cursor: pointer;
+            width: 100%;
+            font-size: 16px;
         }
         
         .btn-secondary:hover {
             background: #f8fafc;
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
         }
         
         .input-field {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
             transition: all 0.3s ease;
+            background: white;
         }
         
         .input-field:focus {
             outline: none;
             border-color: #3B82F6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .input-number {
+            width: 80px;
+            text-align: center;
         }
         
         .progress-bar {
@@ -127,8 +171,8 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-width: 500px;
-            width: 90%;
+            max-width: 90%;
+            width: 500px;
             transform: translateY(20px);
             transition: all 0.3s ease;
         }
@@ -156,9 +200,9 @@
         }
         
         .badge {
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
         }
         
@@ -199,10 +243,13 @@
         .copy-btn {
             cursor: pointer;
             transition: all 0.2s ease;
+            padding: 4px;
+            border-radius: 6px;
         }
         
         .copy-btn:hover {
             transform: scale(1.1);
+            background: rgba(59, 130, 246, 0.1);
         }
         
         .masked-input {
@@ -213,26 +260,340 @@
         .security-tip {
             background: #f0f9ff;
             border-left: 4px solid #0ea5e9;
-            padding: 12px 16px;
-            border-radius: 0 8px 8px 0;
-            margin: 8px 0;
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 10px 0;
             font-size: 14px;
             color: #0c4a6e;
+            line-height: 1.6;
+        }
+        
+        .config-group {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 12px 0;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .config-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .config-title {
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+        
+        .config-title i {
+            margin-right: 10px;
+            color: #3B82F6;
+            font-size: 18px;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 10px 14px;
+            position: absolute;
+            z-index: 1;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+            white-space: normal;
+            line-height: 1.5;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .password-masked {
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+        
+        .mode-badge {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+        }
+        
+        .mode-badge i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-item:hover {
+            border-color: #3B82F6;
+            background: #f8fafc;
+        }
+        
+        .checkbox-item input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .checkbox-item span {
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            align-items: flex-end;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-hint {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+        }
+        
+        /* 表格样式优化 */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+        }
+        
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #374151;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background 0.2s ease;
+        }
+        
+        .data-table tr:hover td {
+            background: #f8fafc;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 响应式优化 - 更加精细的断点设置 */
+        @media (max-width: 1200px) {
+            .page-container {
+                max-width: 90%;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-cols-2, .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .card {
+                border-radius: 12px;
+                padding: 16px;
+            }
+            
+            .config-group {
+                padding: 16px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-container {
+                padding: 0.5rem;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+                padding: 12px;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .input-field {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+            
+            .input-number {
+                width: 70px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 10px 12px;
+            }
+        }
+        
+        @media (max-width: 375px) {
+            .card {
+                border-radius: 8px;
+                padding: 10px;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+            
+            .input-field {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            .badge {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+            
+            .data-table {
+                font-size: 12px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 8px 10px;
+            }
+        }
+        
+        /* 确保模态框在小屏幕上正常显示 */
+        @media (max-width: 480px) {
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                margin: 0 10px;
+            }
+        }
+        
+        /* 修复移动端的输入框问题 */
+        @media (max-width: 360px) {
+            .form-label {
+                font-size: 13px;
+            }
+            
+            .form-hint {
+                font-size: 11px;
+            }
+            
+            .checkbox-item span {
+                font-size: 13px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
-    <nav class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+    <!-- 页面容器 - 增加内边距防止内容紧贴边缘 -->
+    <div class="page-container">
+        <!-- 顶部导航 -->
+        <nav class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 mb-6">
+            <div class="flex justify-between items-center h-16 px-4">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
                         <i class="fa fa-envelope text-white text-lg"></i>
                     </div>
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">邮箱批量注册系统</h1>
-                        <p class="text-xs text-gray-500">北沐版 v1.0</p>
+                        <p class="text-xs text-gray-500">北沐版 v1.4</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -241,361 +602,430 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <!-- 主要内容 -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- 状态卡片 -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="card p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">今日注册</p>
-                        <p id="todayCount" class="text-2xl font-bold text-gray-900">0</p>
-                    </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <i class="fa fa-plus text-primary text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">总注册数</p>
-                        <p id="totalCount" class="text-2xl font-bold text-gray-900">0</p>
-                    </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                        <i class="fa fa-trophy text-secondary text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">成功率</p>
-                        <p id="successRate" class="text-2xl font-bold text-gray-900">0%</p>
-                    </div>
-                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                        <i class="fa fa-check-circle text-accent text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">API状态</p>
-                        <div class="flex items-center mt-2">
-                            <span id="apiStatusBadge" class="badge badge-warning">未连接</span>
-                        </div>
-                    </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                        <i class="fa fa-server text-purple-600 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 配置区域 -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- API配置 -->
-            <div class="lg:col-span-2 space-y-6">
+        <!-- 主要内容 -->
+        <div class="space-y-6">
+            <!-- 状态卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">
-                        <i class="fa fa-cogs mr-2 text-primary"></i>
-                        API配置
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    API域名 <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" id="apiDomain" 
-                                       class="input-field"
-                                       placeholder="输入您的邮箱登录地址域名"
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Access Token <span class="badge badge-info text-xs px-2 py-1 ml-2">已加密</span>
-                                </label>
-                                <div class="relative">
-                                    <input type="text" id="accessToken" 
-                                           class="input-field pr-12 masked-input"
-                                           placeholder="请生成或输入Token" readonly>
-                                    <button id="copyTokenBtn" 
-                                            class="absolute right-3 top-3 text-gray-400 hover:text-primary copy-btn"
-                                            onclick="copyToken()">
-                                        <i class="fa fa-copy"></i>
-                                    </button>
-                                    <button id="toggleTokenBtn" 
-                                            class="absolute right-10 top-3 text-gray-400 hover:text-primary copy-btn"
-                                            onclick="toggleTokenVisibility()">
-                                        <i id="toggleTokenIcon" class="fa fa-eye-slash"></i>
-                                    </button>
-                                </div>
-                                <div class="security-tip">
-                                    <i class="fa fa-shield mr-2"></i>
-                                    Token已加密显示，点击眼睛图标可临时查看完整内容
-                                </div>
-                                <div class="mt-2 flex space-x-2">
-                                    <button id="generateTokenBtn" 
-                                            class="flex-1 btn-primary"
-                                            onclick="generateToken()">
-                                        <i class="fa fa-bullseye mr-2"></i>生成Token
-                                    </button>
-                                    <button id="loadTokenBtn" 
-                                            class="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                                            onclick="showTokenHistory()">
-                                        <i class="fa fa-history mr-2"></i>历史
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    管理员邮箱 <span class="text-red-500">*</span>
-                                </label>
-                                <input type="email" id="adminEmail" 
-                                       class="input-field"
-                                       placeholder="输入您的管理员邮箱">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    管理员密码 <span class="text-red-500">*</span>
-                                </label>
-                                <input type="password" id="adminPassword" 
-                                       class="input-field"
-                                       placeholder="请输入密码">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 注册设置 -->
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">
-                        <i class="fa fa-users mr-2 text-primary"></i>
-                        注册设置
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    注册数量 <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" id="registerCount" min="1" max="100" value="5"
-                                       class="input-field">
-                                <p class="text-xs text-gray-500 mt-1">单次最多注册100个账号</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    邮箱域名 <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" id="emailDomain" 
-                                       class="input-field"
-                                       placeholder="example.com">
-                            </div>
-                        </div>
-                        
+                    <div class="flex items-center justify-between">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                用户名前缀
-                            </label>
-                            <input type="text" id="usernamePrefix" 
-                                   class="input-field"
-                                   placeholder="可选，如：user_">
-                            <p class="text-xs text-gray-500 mt-1">留空将使用随机用户名</p>
+                            <p class="text-sm font-medium text-gray-600">今日注册</p>
+                            <p id="todayCount" class="text-2xl font-bold text-gray-900">0</p>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    密码长度
-                                </label>
-                                <select id="passwordLength" class="input-field">
-                                    <option value="8">8位</option>
-                                    <option value="10" selected>10位</option>
-                                    <option value="12">12位</option>
-                                    <option value="16">16位</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    权限角色
-                                </label>
-                                <input type="text" id="roleName" 
-                                       class="input-field"
-                                       placeholder="可选，不填使用默认角色">
-                            </div>
-                        </div>
-                        
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h3 class="text-sm font-semibold text-gray-700 mb-3">
-                                <i class="fa fa-shield mr-2 text-primary"></i>
-                                密码安全设置
-                            </h3>
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="includeUppercase" checked
-                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <span class="ml-2 text-gray-700">包含大写字母</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="includeLowercase" checked
-                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <span class="ml-2 text-gray-700">包含小写字母</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="includeNumbers" checked
-                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <span class="ml-2 text-gray-700">包含数字</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="includeSymbols" 
-                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <span class="ml-2 text-gray-700">包含特殊符号</span>
-                                </label>
-                            </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i class="fa fa-plus text-primary text-xl"></i>
                         </div>
                     </div>
-                    
-                    <div class="mt-6 flex space-x-4">
-                        <button id="startRegisterBtn" 
-                                class="flex-1 btn-primary"
-                                onclick="startRegistration()">
-                            <i class="fa fa-play mr-2"></i>
-                            开始注册
-                        </button>
-                        <button id="resetBtn" 
-                                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                                onclick="resetForm()">
-                            <i class="fa fa-bullseye mr-2"></i>
-                            重置
-                        </button>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">总注册数</p>
+                            <p id="totalCount" class="text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i class="fa fa-trophy text-secondary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">成功率</p>
+                            <p id="successRate" class="text-2xl font-bold text-gray-900">0%</p>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                            <i class="fa fa-check-circle text-accent text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">API状态</p>
+                            <div class="flex items-center mt-2">
+                                <span id="apiStatusBadge" class="badge badge-warning">未连接</span>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i class="fa fa-server text-purple-600 text-xl"></i>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 侧边栏 -->
-            <div class="space-y-6">
-                <!-- 进度 -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        <i class="fa fa-spinner mr-2 text-primary"></i>
-                        注册进度
-                    </h3>
-                    
-                    <div class="space-y-4">
-                        <div class="progress-bar">
-                            <div id="progressFill" class="progress-fill"></div>
+            <!-- 配置区域 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- API配置和注册设置 -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- API配置 -->
+                    <div class="card p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">
+                            <i class="fa fa-cogs mr-2 text-primary"></i>
+                            API配置
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        API域名 <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="apiDomain" 
+                                           class="input-field"
+                                           placeholder="输入您的邮箱登录地址域名">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Access Token <span class="badge badge-info text-xs px-2 py-1 ml-2">已加密</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input type="text" id="accessToken" 
+                                               class="input-field pr-16 masked-input"
+                                               placeholder="请生成或输入Token" readonly>
+                                        <button id="toggleTokenBtn" 
+                                                class="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary copy-btn"
+                                                onclick="toggleTokenVisibility()">
+                                            <i id="toggleTokenIcon" class="fa fa-eye-slash"></i>
+                                        </button>
+                                        <button id="copyTokenBtn" 
+                                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary copy-btn"
+                                                onclick="copyToken()">
+                                            <i class="fa fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="security-tip">
+                                <i class="fa fa-shield mr-2"></i>
+                                Token已加密显示，点击眼睛图标可临时查看完整内容
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        管理员邮箱 <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="email" id="adminEmail" 
+                                           class="input-field"
+                                           placeholder="输入您的管理员邮箱">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        管理员密码 <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="password" id="adminPassword" 
+                                           class="input-field"
+                                           placeholder="请输入密码">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <button id="generateTokenBtn" 
+                                        class="btn-primary"
+                                        onclick="generateToken()">
+                                    <i class="fa fa-bullseye mr-2"></i>生成Token
+                                </button>
+                                <button id="loadTokenBtn" 
+                                        class="btn-secondary"
+                                        onclick="showTokenHistory()">
+                                    <i class="fa fa-history mr-2"></i>Token历史
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 注册设置 -->
+                    <div class="card p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">
+                            <i class="fa fa-users mr-2 text-primary"></i>
+                            注册设置
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        注册数量 <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="number" id="registerCount" min="1" max="100" value="5"
+                                           class="input-field input-number">
+                                    <span class="form-hint">单次最多注册100个账号</span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        邮箱域名 <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="emailDomain" 
+                                           class="input-field"
+                                           placeholder="example.com">
+                                </div>
+                            </div>
+                            
+                            <!-- 用户名配置 -->
+                            <div class="config-group">
+                                <div class="config-header">
+                                    <div class="config-title">
+                                        <i class="fa fa-user"></i>
+                                        用户名配置
+                                    </div>
+                                    <div class="tooltip">
+                                        <i class="fa fa-question-circle text-gray-400"></i>
+                                        <span class="tooltiptext">
+                                            配置用户名的生成规则，包括前缀、长度和字符类型
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-6">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            用户名前缀
+                                        </label>
+                                        <input type="text" id="usernamePrefix" 
+                                               class="input-field"
+                                               placeholder="可选，如：user_">
+                                        <span class="form-hint">留空将使用完全随机的用户名</span>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                用户名长度 <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="number" id="usernameLength" min="1" max="20" value="6"
+                                                   class="input-field input-number">
+                                            <span class="form-hint">不含前缀的基础长度(1-20位)</span>
+                                        </div>
+                                        <div class="form-group flex items-center">
+                                            <div class="mode-badge">
+                                                <i class="fa fa-random"></i>
+                                                <span>完全随机模式</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="form-label">
+                                            字符类型选择
+                                        </label>
+                                        <div class="checkbox-group">
+                                            <label class="checkbox-item">
+                                                <input type="checkbox" id="includeUsernameUppercase" checked
+                                                       class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                                <span>包含大写字母</span>
+                                            </label>
+                                            <label class="checkbox-item">
+                                                <input type="checkbox" id="includeUsernameLowercase" checked
+                                                       class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                                <span>包含小写字母</span>
+                                            </label>
+                                            <label class="checkbox-item">
+                                                <input type="checkbox" id="includeUsernameNumbers" checked
+                                                       class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                                <span>包含数字</span>
+                                            </label>
+                                            <label class="checkbox-item">
+                                                <input type="checkbox" id="includeUsernameSymbols" 
+                                                       class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                                <span>包含特殊符号</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        密码长度
+                                    </label>
+                                    <select id="passwordLength" class="input-field">
+                                        <option value="8">8位</option>
+                                        <option value="10" selected>10位</option>
+                                        <option value="12">12位</option>
+                                        <option value="16">16位</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        权限角色
+                                    </label>
+                                    <input type="text" id="roleName" 
+                                           class="input-field"
+                                           placeholder="可选，不填使用默认角色">
+                                </div>
+                            </div>
+                            
+                            <div class="config-group">
+                                <div class="config-header">
+                                    <div class="config-title">
+                                        <i class="fa fa-shield"></i>
+                                        密码安全设置
+                                    </div>
+                                </div>
+                                
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="includeUppercase" checked
+                                               class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                        <span>包含大写字母</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="includeLowercase" checked
+                                               class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                        <span>包含小写字母</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="includeNumbers" checked
+                                               class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                        <span>包含数字</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="includeSymbols" 
+                                               class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                        <span>包含特殊符号</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="flex justify-between text-sm text-gray-600">
-                            <span id="progressText">0/0</span>
-                            <span id="progressPercent">0%</span>
-                        </div>
-                        
-                        <div id="statusMessage" class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-                            请先配置API并生成Token
+                        <div class="action-buttons">
+                            <button id="startRegisterBtn" 
+                                    class="btn-primary"
+                                    onclick="startRegistration()">
+                                <i class="fa fa-play mr-2"></i>
+                                开始注册
+                            </button>
+                            <button id="resetBtn" 
+                                    class="btn-secondary"
+                                    onclick="resetForm()">
+                                <i class="fa fa-bullseye mr-2"></i>
+                                重置设置
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- 最近结果 -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        <i class="fa fa-list mr-2 text-primary"></i>
-                        最近结果
-                    </h3>
-                    
-                    <div id="recentResults" class="space-y-3 max-h-64 overflow-y-auto">
-                        <div class="text-center text-gray-500 py-8">
-                            <i class="fa fa-inbox text-4xl mb-2 opacity-50"></i>
-                            <p class="text-sm">暂无注册记录</p>
+                <!-- 侧边栏 -->
+                <div class="space-y-6">
+                    <!-- 进度 -->
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            <i class="fa fa-spinner mr-2 text-primary"></i>
+                            注册进度
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="progress-bar">
+                                <div id="progressFill" class="progress-fill"></div>
+                            </div>
+                            
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span id="progressText">0/0</span>
+                                <span id="progressPercent">0%</span>
+                            </div>
+                            
+                            <div id="statusMessage" class="text-sm text-gray-600 bg-gray-50 rounded-lg p-4">
+                                请先配置API并生成Token
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="mt-4 flex space-x-2">
-                        <button id="exportBtn" 
-                                class="flex-1 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
-                                onclick="exportResults()" disabled>
-                            <i class="fa fa-download mr-2"></i>
-                            导出
-                        </button>
-                        <button id="clearBtn" 
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
-                                onclick="clearResults()" disabled>
-                            <i class="fa fa-trash mr-2"></i>
-                            清空
-                        </button>
-                    </div>
-                </div>
 
-                <!-- 系统日志 -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        <i class="fa fa-terminal mr-2 text-primary"></i>
-                        系统日志
-                    </h3>
-                    
-                    <div id="systemLogs" class="text-sm text-gray-600 space-y-2 max-h-48 overflow-y-auto">
-                        <div class="log-entry">
-                            <span class="text-gray-400">[系统]</span>
-                            <span>系统已启动，准备就绪</span>
+                    <!-- 最近结果 -->
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            <i class="fa fa-list mr-2 text-primary"></i>
+                            最近结果
+                        </h3>
+                        
+                        <div id="recentResults" class="space-y-3 max-h-64 overflow-y-auto">
+                            <div class="text-center text-gray-500 py-8">
+                                <i class="fa fa-inbox text-4xl mb-2 opacity-50"></i>
+                                <p class="text-sm">暂无注册记录</p>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons" style="margin-top: 16px;">
+                            <button id="exportBtn" 
+                                    class="btn-primary" 
+                                    onclick="exportResults()" disabled>
+                                <i class="fa fa-download mr-2"></i>
+                                导出
+                            </button>
+                            <button id="clearBtn" 
+                                    class="btn-secondary" 
+                                    onclick="clearResults()" disabled>
+                                <i class="fa fa-trash mr-2"></i>
+                                清空
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 系统日志 -->
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            <i class="fa fa-terminal mr-2 text-primary"></i>
+                            系统日志
+                        </h3>
+                        
+                        <div id="systemLogs" class="text-sm text-gray-600 space-y-2 max-h-48 overflow-y-auto">
+                            <div class="log-entry">
+                                <span class="text-gray-400">[系统]</span>
+                                <span>系统已启动，准备就绪</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 详细记录 -->
-        <div class="mt-8 card p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">
-                    <i class="fa fa-table mr-2 text-primary"></i>
-                    详细注册记录
-                </h2>
-                <div class="flex space-x-2">
-                    <input type="text" id="searchInput" placeholder="搜索邮箱..."
-                           class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm">
-                    <select id="filterSelect" 
-                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm">
-                        <option value="all">全部状态</option>
-                        <option value="success">注册成功</option>
-                        <option value="failed">注册失败</option>
-                    </select>
+            <!-- 详细记录 -->
+            <div class="card p-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                    <h2 class="text-xl font-bold text-gray-900">
+                        <i class="fa fa-table mr-2 text-primary"></i>
+                        详细注册记录
+                    </h2>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <input type="text" id="searchInput" placeholder="搜索邮箱..."
+                               class="input-field">
+                        <select id="filterSelect" 
+                                class="input-field">
+                            <option value="all">全部状态</option>
+                            <option value="success">注册成功</option>
+                            <option value="failed">注册失败</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-gray-200">
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">序号</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">邮箱地址</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">密码</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">状态</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">时间</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-700">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTable">
-                        <tr>
-                            <td colspan="6" class="text-center py-8 text-gray-500">
-                                <i class="fa fa-search text-4xl mb-2 opacity-50"></i>
-                                <p>暂无数据</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left py-4 px-4 font-semibold text-gray-700">序号</th>
+                                <th class="text-left py-4 px-4 font-semibold text-gray-700">邮箱地址</th>
+                                <th class="text-left py-4 px-4 font-semibold text-gray-700">密码</th>
+                                <th class="text-left py-4 px-4 font-semibold text-gray-700">状态</th>
+                                <th class="text-left py-4 px-4 font-semibold text-gray-700">时间</th>
+                                <th class="text-left py-4 px-4 font-semibold text-gray-700">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTable">
+                            <tr>
+                                <td colspan="6" class="text-center py-8 text-gray-500">
+                                    <i class="fa fa-search text-4xl mb-2 opacity-50"></i>
+                                    <p>暂无数据</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -623,11 +1053,11 @@
             </div>
             <h3 class="text-lg font-semibold text-gray-900 mb-2">操作成功</h3>
             <p id="successMessage" class="text-gray-600 mb-6">批量注册完成！</p>
-            <div class="flex space-x-3">
-                <button class="flex-1 btn-primary" onclick="hideModal('successModal')">
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="hideModal('successModal')">
                     确定
                 </button>
-                <button class="flex-1 btn-secondary" onclick="exportResults(); hideModal('successModal')">
+                <button class="btn-secondary" onclick="exportResults(); hideModal('successModal')">
                     导出结果
                 </button>
             </div>
@@ -642,7 +1072,7 @@
             </div>
             <h3 class="text-lg font-semibold text-gray-900 mb-2">操作失败</h3>
             <p id="errorMessage" class="text-gray-600 mb-6">请检查网络连接后重试</p>
-            <button class="w-full btn-primary" onclick="hideModal('errorModal')">
+            <button class="btn-primary" onclick="hideModal('errorModal')">
                 确定
             </button>
         </div>
@@ -669,7 +1099,7 @@
             
             <div class="mt-4 pt-4 border-t border-gray-200">
                 <button id="clearTokenHistoryBtn" 
-                        class="w-full px-4 py-2 text-red-500 hover:text-red-700 transition-colors text-sm"
+                        class="w-full btn-secondary"
                         onclick="clearTokenHistory()">
                     <i class="fa fa-trash mr-2"></i>清空历史记录
                 </button>
@@ -699,23 +1129,27 @@
                 </div>
                 
                 <div>
-                    <h4 class="font-semibold text-gray-900 mb-2">3. 注册设置</h4>
+                    <h4 class="font-semibold text-gray-900 mb-2">3. 用户名配置</h4>
                     <ul class="text-gray-600 space-y-1">
-                        <li>• 注册数量：单次最多可注册100个账号</li>
-                        <li>• 邮箱域名：填写您的邮箱域名，如@bmcggzs.cn</li>
-                        <li>• 用户名前缀：可选，用于生成有规律的用户名</li>
-                        <li>• 权限角色：可选，不填使用默认角色</li>
+                        <li>• 用户名长度：1-20位可选择（不含前缀的基础长度）</li>
+                        <li>• 字符类型：可选择包含大写字母、小写字母、数字、特殊符号</li>
+                        <li>• 前缀支持：可选，如设置前缀会在前缀后添加随机字符</li>
+                        <li>• 生成模式：固定为完全随机模式</li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="font-semibold text-gray-900 mb-2">4. 常见问题</h4>
+                    <h4 class="font-semibold text-gray-900 mb-2">4. 密码安全</h4>
+                    <p class="text-gray-600">密码在界面中默认加密显示，点击复制按钮可以复制完整密码。导出CSV文件时会显示完整密码。</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">5. 常见问题</h4>
                     <ul class="text-gray-600 space-y-1">
                         <li>• Token生成失败：检查网络连接和API配置</li>
                         <li>• 注册失败：检查Token是否有效，API是否正常</li>
                         <li>• 网络问题：确保设备网络连接正常</li>
                         <li>• 安全提示：请勿在公共设备上保存敏感信息</li>
-                        <li>• 安全提示：如在公共设备使用请使用无痕模式</li>
                     </ul>
                 </div>
             </div>
@@ -806,6 +1240,11 @@
                     console.log('表单数据加载完成');
                 }
                 
+                // 设置默认的用户名长度为6
+                if (!document.getElementById('usernameLength').value) {
+                    document.getElementById('usernameLength').value = '6';
+                }
+                
             } catch (error) {
                 console.error('数据加载失败:', error);
                 log('错误', `数据加载失败: ${error.message}`);
@@ -825,6 +1264,7 @@
                     adminEmail: document.getElementById('adminEmail').value,
                     emailDomain: document.getElementById('emailDomain').value,
                     usernamePrefix: document.getElementById('usernamePrefix').value,
+                    usernameLength: document.getElementById('usernameLength').value,
                     roleName: document.getElementById('roleName').value
                 };
                 localStorage.setItem('formData', JSON.stringify(formData));
@@ -842,6 +1282,12 @@
                 return token.substring(0, 2) + '***' + token.substring(token.length - 2);
             }
             return token.substring(0, 4) + '********' + token.substring(token.length - 4);
+        }
+
+        // 密码加密显示
+        function maskPassword(password) {
+            if (!password) return '';
+            return '••••••••'; // 固定显示8个点
         }
 
         // 切换Token可见性
@@ -1077,6 +1523,7 @@
                 const registerCount = parseInt(document.getElementById('registerCount').value);
                 const usernamePrefix = document.getElementById('usernamePrefix').value.trim();
                 const roleName = document.getElementById('roleName').value.trim();
+                const usernameLength = parseInt(document.getElementById('usernameLength').value);
                 
                 if (!apiDomain || !accessToken || !emailDomain) {
                     showError('请填写完整的API配置和注册信息');
@@ -1085,6 +1532,18 @@
                 
                 if (isNaN(registerCount) || registerCount < 1 || registerCount > 100) {
                     showError('注册数量必须在1-100之间');
+                    return;
+                }
+                
+                if (isNaN(usernameLength) || usernameLength < 1 || usernameLength > 20) {
+                    showError('用户名长度必须在1-20之间');
+                    return;
+                }
+                
+                // 验证用户名配置
+                const usernameConfig = getUsernameConfig();
+                if (!usernameConfig.valid) {
+                    showError(usernameConfig.error);
                     return;
                 }
                 
@@ -1101,7 +1560,7 @@
                     updateLoadingProgress(progress);
                     updateProgress(i + 1, registerCount);
                     
-                    const username = generateUsername(usernamePrefix, i);
+                    const username = generateUsername(usernamePrefix, usernameLength);
                     const email = `${username}@${emailDomain}`;
                     const password = generatePassword();
                     
@@ -1209,19 +1668,52 @@
             }
         }
 
-        // 生成用户名
-        function generateUsername(prefix, index) {
-            if (prefix) {
-                return `${prefix}${index + 1}`;
+        // 获取用户名配置
+        function getUsernameConfig() {
+            const includeUppercase = document.getElementById('includeUsernameUppercase').checked;
+            const includeLowercase = document.getElementById('includeUsernameLowercase').checked;
+            const includeNumbers = document.getElementById('includeUsernameNumbers').checked;
+            const includeSymbols = document.getElementById('includeUsernameSymbols').checked;
+            
+            // 验证至少选择一种字符类型
+            if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSymbols) {
+                return {
+                    valid: false,
+                    error: '请至少选择一种用户名字符类型'
+                };
             }
             
-            const adjectives = ['happy', 'sunny', 'smart', 'brave', 'kind', 'calm', 'wise', 'cool'];
-            const nouns = ['user', 'mail', 'sky', 'star', 'moon', 'cloud', 'bird', 'tree'];
-            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-            const noun = nouns[Math.floor(Math.random() * nouns.length)];
-            const number = Math.floor(Math.random() * 1000);
+            return {
+                valid: true,
+                includeUppercase: includeUppercase,
+                includeLowercase: includeLowercase,
+                includeNumbers: includeNumbers,
+                includeSymbols: includeSymbols
+            };
+        }
+
+        // 生成用户名 - 只使用完全随机模式
+        function generateUsername(prefix, length) {
+            const config = getUsernameConfig();
             
-            return `${adj}${noun}${number}`;
+            let charset = '';
+            if (config.includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (config.includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (config.includeNumbers) charset += '0123456789';
+            if (config.includeSymbols) charset += '!@#$%^&*()_+{}[]|:;<>,.?/~`-=';
+            
+            let randomPart = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                randomPart += charset[randomIndex];
+            }
+            
+            // 如果有前缀，添加前缀
+            if (prefix) {
+                return prefix + randomPart;
+            }
+            
+            return randomPart;
         }
 
         // 生成密码
@@ -1303,7 +1795,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium ${status === 'success' ? 'text-green-800' : 'text-red-800'}">${account.email}</p>
-                        <p class="text-xs ${status === 'success' ? 'text-green-600' : 'text-red-600'}">${account.password}</p>
+                        <p class="text-xs ${status === 'success' ? 'text-green-600' : 'text-red-600'}">${maskPassword(account.password)}</p>
                     </div>
                 </div>
                 <span class="text-xs ${status === 'success' ? 'text-green-600' : 'text-red-600'}">
@@ -1365,7 +1857,7 @@
                     <td class="py-3 px-4 font-medium text-gray-900">${account.email}</td>
                     <td class="py-3 px-4">
                         <div class="flex items-center space-x-2">
-                            <span class="text-gray-600">${account.password}</span>
+                            <span class="text-gray-600 password-masked">${maskPassword(account.password)}</span>
                             <button onclick="copyText('${account.password}')" 
                                     class="text-primary hover:text-primary/80 text-sm copy-btn">
                                 <i class="fa fa-copy"></i>
@@ -1424,6 +1916,7 @@
                 let csvContent = "邮箱地址,密码,注册时间\n";
                 
                 successAccounts.forEach(account => {
+                    // 导出时显示完整密码
                     csvContent += `${account.email},${account.password},${account.timestamp}\n`;
                 });
                 
@@ -1469,7 +1962,16 @@
         function resetForm() {
             document.getElementById('registerCount').value = 5;
             document.getElementById('usernamePrefix').value = '';
+            document.getElementById('usernameLength').value = '6';
             document.getElementById('roleName').value = '';
+            
+            // 重置用户名字符类型选择
+            document.getElementById('includeUsernameUppercase').checked = true;
+            document.getElementById('includeUsernameLowercase').checked = true;
+            document.getElementById('includeUsernameNumbers').checked = true;
+            document.getElementById('includeUsernameSymbols').checked = false;
+            
+            // 重置密码字符类型选择
             document.getElementById('includeUppercase').checked = true;
             document.getElementById('includeLowercase').checked = true;
             document.getElementById('includeNumbers').checked = true;
