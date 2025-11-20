@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邮箱批量注册系统 - 安全版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #3B82F6;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid #3B82F6;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 90%;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #10B981;
+            color: white;
+        }
+        
+        .badge-error {
+            background: #EF4444;
+            color: white;
+        }
+        
+        .badge-warning {
+            background: #F59E0B;
+            color: white;
+        }
+        
+        .badge-info {
+            background: #3B82F6;
+            color: white;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3B82F6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .copy-btn {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .masked-input {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        
+        .security-tip {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 8px 0;
+            font-size: 14px;
+            color: #0c4a6e;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
+                        <i class="fa fa-envelope text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">邮箱批量注册系统</h1>
+                        <p class="text-xs text-gray-500">安全版 v1.0</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="helpBtn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fa fa-question-circle text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 状态卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">今日注册</p>
+                        <p id="todayCount" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fa fa-plus text-primary text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">总注册数</p>
+                        <p id="totalCount" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="fa fa-trophy text-secondary text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">成功率</p>
+                        <p id="successRate" class="text-2xl font-bold text-gray-900">0%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                        <i class="fa fa-check-circle text-accent text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">API状态</p>
+                        <div class="flex items-center mt-2">
+                            <span id="apiStatusBadge" class="badge badge-warning">未连接</span>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="fa fa-server text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 配置区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- API配置 -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">
+                        <i class="fa fa-cogs mr-2 text-primary"></i>
+                        API配置
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    API域名 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="apiDomain" 
+                                       class="input-field"
+                                       placeholder="https://api.example.com"
+                                       value="https://doc.skymail.ink">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Access Token <span class="badge badge-info text-xs px-2 py-1 ml-2">已加密</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="text" id="accessToken" 
+                                           class="input-field pr-12 masked-input"
+                                           placeholder="请生成或输入Token" readonly>
+                                    <button id="copyTokenBtn" 
+                                            class="absolute right-3 top-3 text-gray-400 hover:text-primary copy-btn"
+                                            onclick="copyToken()">
+                                        <i class="fa fa-copy"></i>
+                                    </button>
+                                    <button id="toggleTokenBtn" 
+                                            class="absolute right-10 top-3 text-gray-400 hover:text-primary copy-btn"
+                                            onclick="toggleTokenVisibility()">
+                                        <i id="toggleTokenIcon" class="fa fa-eye-slash"></i>
+                                    </button>
+                                </div>
+                                <div class="security-tip">
+                                    <i class="fa fa-shield mr-2"></i>
+                                    Token已加密显示，点击眼睛图标可临时查看完整内容
+                                </div>
+                                <div class="mt-2 flex space-x-2">
+                                    <button id="generateTokenBtn" 
+                                            class="flex-1 btn-primary"
+                                            onclick="generateToken()">
+                                        <i class="fa fa-bullseye mr-2"></i>生成Token
+                                    </button>
+                                    <button id="loadTokenBtn" 
+                                            class="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                            onclick="showTokenHistory()">
+                                        <i class="fa fa-history mr-2"></i>历史
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    管理员邮箱 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="email" id="adminEmail" 
+                                       class="input-field"
+                                       placeholder="admin@example.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    管理员密码 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="password" id="adminPassword" 
+                                       class="input-field"
+                                       placeholder="请输入密码">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 注册设置 -->
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">
+                        <i class="fa fa-users mr-2 text-primary"></i>
+                        注册设置
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    注册数量 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number" id="registerCount" min="1" max="100" value="5"
+                                       class="input-field">
+                                <p class="text-xs text-gray-500 mt-1">单次最多注册100个账号</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    邮箱域名 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="emailDomain" 
+                                       class="input-field"
+                                       placeholder="example.com">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                用户名前缀
+                            </label>
+                            <input type="text" id="usernamePrefix" 
+                                   class="input-field"
+                                   placeholder="可选，如：user_">
+                            <p class="text-xs text-gray-500 mt-1">留空将使用随机用户名</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    密码长度
+                                </label>
+                                <select id="passwordLength" class="input-field">
+                                    <option value="8">8位</option>
+                                    <option value="10" selected>10位</option>
+                                    <option value="12">12位</option>
+                                    <option value="16">16位</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    权限角色
+                                </label>
+                                <input type="text" id="roleName" 
+                                       class="input-field"
+                                       placeholder="可选，不填使用默认角色">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h3 class="text-sm font-semibold text-gray-700 mb-3">
+                                <i class="fa fa-shield mr-2 text-primary"></i>
+                                密码安全设置
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="includeUppercase" checked
+                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span class="ml-2 text-gray-700">包含大写字母</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="includeLowercase" checked
+                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span class="ml-2 text-gray-700">包含小写字母</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="includeNumbers" checked
+                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span class="ml-2 text-gray-700">包含数字</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="includeSymbols" 
+                                           class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span class="ml-2 text-gray-700">包含特殊符号</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex space-x-4">
+                        <button id="startRegisterBtn" 
+                                class="flex-1 btn-primary"
+                                onclick="startRegistration()">
+                            <i class="fa fa-play mr-2"></i>
+                            开始注册
+                        </button>
+                        <button id="resetBtn" 
+                                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                onclick="resetForm()">
+                            <i class="fa fa-bullseye mr-2"></i>
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="space-y-6">
+                <!-- 进度 -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fa fa-spinner mr-2 text-primary"></i>
+                        注册进度
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span id="progressText">0/0</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        
+                        <div id="statusMessage" class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+                            请先配置API并生成Token
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近结果 -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fa fa-list mr-2 text-primary"></i>
+                        最近结果
+                    </h3>
+                    
+                    <div id="recentResults" class="space-y-3 max-h-64 overflow-y-auto">
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fa fa-inbox text-4xl mb-2 opacity-50"></i>
+                            <p class="text-sm">暂无注册记录</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex space-x-2">
+                        <button id="exportBtn" 
+                                class="flex-1 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
+                                onclick="exportResults()" disabled>
+                            <i class="fa fa-download mr-2"></i>
+                            导出
+                        </button>
+                        <button id="clearBtn" 
+                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
+                                onclick="clearResults()" disabled>
+                            <i class="fa fa-trash mr-2"></i>
+                            清空
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 系统日志 -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fa fa-terminal mr-2 text-primary"></i>
+                        系统日志
+                    </h3>
+                    
+                    <div id="systemLogs" class="text-sm text-gray-600 space-y-2 max-h-48 overflow-y-auto">
+                        <div class="log-entry">
+                            <span class="text-gray-400">[系统]</span>
+                            <span>系统已启动，准备就绪</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细记录 -->
+        <div class="mt-8 card p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">
+                    <i class="fa fa-table mr-2 text-primary"></i>
+                    详细注册记录
+                </h2>
+                <div class="flex space-x-2">
+                    <input type="text" id="searchInput" placeholder="搜索邮箱..."
+                           class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm">
+                    <select id="filterSelect" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm">
+                        <option value="all">全部状态</option>
+                        <option value="success">注册成功</option>
+                        <option value="failed">注册失败</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">序号</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">邮箱地址</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">密码</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">状态</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">时间</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-700">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable">
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-gray-500">
+                                <i class="fa fa-search text-4xl mb-2 opacity-50"></i>
+                                <p>暂无数据</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <!-- 加载模态框 -->
+    <div id="loadingModal" class="modal">
+        <div class="modal-content p-8 text-center">
+            <div class="inline-block p-4 bg-blue-50 rounded-full mb-4">
+                <div class="loading-spinner mx-auto"></div>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">正在处理</h3>
+            <p id="loadingMessage" class="text-gray-600">请稍候...</p>
+            <div class="mt-4 progress-bar">
+                <div id="loadingProgress" class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功模态框 -->
+    <div id="successModal" class="modal">
+        <div class="modal-content p-8 text-center">
+            <div class="inline-block p-4 bg-green-50 rounded-full mb-4">
+                <i class="fa fa-check text-green-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">操作成功</h3>
+            <p id="successMessage" class="text-gray-600 mb-6">批量注册完成！</p>
+            <div class="flex space-x-3">
+                <button class="flex-1 btn-primary" onclick="hideModal('successModal')">
+                    确定
+                </button>
+                <button class="flex-1 btn-secondary" onclick="exportResults(); hideModal('successModal')">
+                    导出结果
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错误模态框 -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content p-8 text-center">
+            <div class="inline-block p-4 bg-red-50 rounded-full mb-4">
+                <i class="fa fa-exclamation-triangle text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">操作失败</h3>
+            <p id="errorMessage" class="text-gray-600 mb-6">请检查网络连接后重试</p>
+            <button class="w-full btn-primary" onclick="hideModal('errorModal')">
+                确定
+            </button>
+        </div>
+    </div>
+
+    <!-- Token历史模态框 -->
+    <div id="tokenHistoryModal" class="modal">
+        <div class="modal-content p-6 max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Token历史记录</h3>
+                <button onclick="hideModal('tokenHistoryModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="security-tip mb-4">
+                <i class="fa fa-info-circle mr-2"></i>
+                Token历史记录已加密存储在本地，仅用于您的方便使用
+            </div>
+            
+            <div id="tokenHistoryList" class="space-y-3">
+                <!-- Token历史记录将在这里显示 -->
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <button id="clearTokenHistoryBtn" 
+                        class="w-full px-4 py-2 text-red-500 hover:text-red-700 transition-colors text-sm"
+                        onclick="clearTokenHistory()">
+                    <i class="fa fa-trash mr-2"></i>清空历史记录
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助模态框 -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content p-8 max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900">使用帮助</h3>
+                <button onclick="hideModal('helpModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">1. API配置</h4>
+                    <p class="text-gray-600">请正确填写API域名、管理员邮箱和密码，然后点击"生成Token"获取访问令牌。Token生成后会自动保存，下次使用时可以直接从历史记录中加载。</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">2. Token安全</h4>
+                    <p class="text-gray-600">Token默认加密显示，点击眼睛图标可临时查看完整内容。所有Token历史记录都加密存储在本地，确保您的信息安全。</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">3. 注册设置</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• 注册数量：单次最多可注册100个账号</li>
+                        <li>• 邮箱域名：填写您的邮箱域名，如@example.com</li>
+                        <li>• 用户名前缀：可选，用于生成有规律的用户名</li>
+                        <li>• 权限角色：可选，不填使用默认角色</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">4. 常见问题</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• Token生成失败：检查网络连接和API配置</li>
+                        <li>• 注册失败：检查Token是否有效，API是否正常</li>
+                        <li>• 网络问题：确保设备网络连接正常</li>
+                        <li>• 安全提示：请勿在公共设备上保存敏感信息</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast通知 -->
+    <div id="toast" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // 全局变量
+        let registeredAccounts = [];
+        let tokenHistory = [];
+        let isRegistering = false;
+        let tokenVisible = false;
+        let originalToken = '';
+
+        // 初始化函数
+        function init() {
+            try {
+                console.log('系统初始化开始...');
+                
+                // 加载保存的数据
+                loadData();
+                
+                // 更新界面
+                updateDashboard();
+                updateResultsTable();
+                updateButtonStates();
+                
+                // 添加事件监听器
+                document.getElementById('searchInput').addEventListener('input', filterResults);
+                document.getElementById('filterSelect').addEventListener('change', filterResults);
+                document.getElementById('helpBtn').addEventListener('click', () => showModal('helpModal'));
+                
+                // 点击模态框外部关闭
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        hideAllModals();
+                    }
+                });
+                
+                console.log('系统初始化完成');
+                log('系统', '系统已启动，准备就绪');
+                
+            } catch (error) {
+                console.error('初始化失败:', error);
+                showError('系统初始化失败，请刷新页面重试');
+                log('错误', `初始化失败: ${error.message}`);
+            }
+        }
+
+        // 加载数据
+        function loadData() {
+            try {
+                // 加载注册记录
+                const savedAccounts = localStorage.getItem('registeredAccounts');
+                if (savedAccounts) {
+                    registeredAccounts = JSON.parse(savedAccounts);
+                    console.log(`加载了 ${registeredAccounts.length} 条注册记录`);
+                }
+                
+                // 加载Token历史
+                const savedTokenHistory = localStorage.getItem('tokenHistory');
+                if (savedTokenHistory) {
+                    tokenHistory = JSON.parse(savedTokenHistory);
+                    console.log(`加载了 ${tokenHistory.length} 条Token记录`);
+                }
+                
+                // 加载表单数据
+                const savedFormData = localStorage.getItem('formData');
+                if (savedFormData) {
+                    const formData = JSON.parse(savedFormData);
+                    Object.keys(formData).forEach(key => {
+                        const element = document.getElementById(key);
+                        if (element) {
+                            if (key === 'accessToken' && formData[key]) {
+                                // Token需要特殊处理，加密显示
+                                originalToken = formData[key];
+                                element.value = maskToken(formData[key]);
+                            } else {
+                                element.value = formData[key];
+                            }
+                        }
+                    });
+                    console.log('表单数据加载完成');
+                }
+                
+            } catch (error) {
+                console.error('数据加载失败:', error);
+                log('错误', `数据加载失败: ${error.message}`);
+            }
+        }
+
+        // 保存数据
+        function saveData() {
+            try {
+                localStorage.setItem('registeredAccounts', JSON.stringify(registeredAccounts));
+                localStorage.setItem('tokenHistory', JSON.stringify(tokenHistory));
+                
+                // 保存表单数据
+                const formData = {
+                    apiDomain: document.getElementById('apiDomain').value,
+                    accessToken: originalToken, // 保存原始Token，不保存加密后的
+                    adminEmail: document.getElementById('adminEmail').value,
+                    emailDomain: document.getElementById('emailDomain').value,
+                    usernamePrefix: document.getElementById('usernamePrefix').value,
+                    roleName: document.getElementById('roleName').value
+                };
+                localStorage.setItem('formData', JSON.stringify(formData));
+                
+            } catch (error) {
+                console.error('数据保存失败:', error);
+                log('错误', `数据保存失败: ${error.message}`);
+            }
+        }
+
+        // Token加密显示
+        function maskToken(token) {
+            if (!token) return '';
+            if (token.length <= 8) {
+                return token.substring(0, 2) + '***' + token.substring(token.length - 2);
+            }
+            return token.substring(0, 4) + '********' + token.substring(token.length - 4);
+        }
+
+        // 切换Token可见性
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('accessToken');
+            const toggleIcon = document.getElementById('toggleTokenIcon');
+            
+            if (tokenVisible) {
+                // 隐藏Token，显示加密版本
+                tokenInput.value = maskToken(originalToken);
+                toggleIcon.className = 'fa fa-eye-slash';
+                tokenVisible = false;
+                setTimeout(() => {
+                    showToast('Token已隐藏');
+                }, 100);
+            } else {
+                // 显示完整Token
+                tokenInput.value = originalToken || '';
+                toggleIcon.className = 'fa fa-eye';
+                tokenVisible = true;
+                showToast('Token显示10秒后将自动隐藏');
+                
+                // 10秒后自动隐藏
+                setTimeout(() => {
+                    if (tokenVisible) {
+                        toggleTokenVisibility();
+                    }
+                }, 10000);
+            }
+        }
+
+        // 生成Token
+        async function generateToken() {
+            try {
+                const apiDomain = document.getElementById('apiDomain').value.trim();
+                const adminEmail = document.getElementById('adminEmail').value.trim();
+                const adminPassword = document.getElementById('adminPassword').value.trim();
+                
+                if (!apiDomain || !adminEmail || !adminPassword) {
+                    showError('请填写完整的API配置信息');
+                    return;
+                }
+                
+                if (!apiDomain.startsWith('http://') && !apiDomain.startsWith('https://')) {
+                    showError('API域名必须以http://或https://开头');
+                    return;
+                }
+                
+                showLoading('正在生成Token...');
+                
+                try {
+                    const response = await fetch(`${apiDomain}/api/public/genToken`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: adminEmail, password: adminPassword })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${errorText || '请求失败'}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.code === 200 && data.data && data.data.token) {
+                        originalToken = data.data.token;
+                        document.getElementById('accessToken').value = maskToken(originalToken);
+                        updateApiStatus(true);
+                        
+                        // 保存到历史记录
+                        saveTokenToHistory({
+                            token: originalToken,
+                            apiDomain: apiDomain,
+                            adminEmail: adminEmail,
+                            timestamp: new Date().toLocaleString()
+                        });
+                        
+                        hideModal('loadingModal');
+                        showSuccess('Token生成成功！已加密显示');
+                        log('系统', 'Token生成成功');
+                        saveData();
+                    } else {
+                        throw new Error(data.message || 'Token生成失败，返回数据格式不正确');
+                    }
+                    
+                } catch (networkError) {
+                    console.error('Token生成网络错误:', networkError);
+                    
+                    // 详细的错误信息
+                    let errorMessage = 'Token生成失败: ';
+                    
+                    if (networkError.message.includes('Failed to fetch')) {
+                        errorMessage += '网络连接失败，请检查：\n1. API域名是否正确\n2. 网络连接是否正常\n3. 是否有防火墙或VPN限制\n4. CORS跨域设置是否正确';
+                    } else if (networkError.message.includes('HTTP 404')) {
+                        errorMessage += 'API接口不存在，请确认API域名正确';
+                    } else if (networkError.message.includes('HTTP 401')) {
+                        errorMessage += '身份验证失败，请检查管理员邮箱和密码';
+                    } else if (networkError.message.includes('HTTP 500')) {
+                        errorMessage += '服务器内部错误，请联系API提供商';
+                    } else {
+                        errorMessage += networkError.message;
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+                
+            } catch (error) {
+                console.error('Token生成失败:', error);
+                hideModal('loadingModal');
+                showError(error.message);
+                log('错误', `Token生成失败: ${error.message}`);
+            }
+        }
+
+        // 保存Token到历史记录
+        function saveTokenToHistory(tokenInfo) {
+            try {
+                tokenHistory.unshift(tokenInfo);
+                if (tokenHistory.length > 10) {
+                    tokenHistory = tokenHistory.slice(0, 10);
+                }
+                saveData();
+            } catch (error) {
+                console.error('Token历史保存失败:', error);
+            }
+        }
+
+        // 显示Token历史记录
+        function showTokenHistory() {
+            const tokenHistoryList = document.getElementById('tokenHistoryList');
+            tokenHistoryList.innerHTML = '';
+            
+            if (tokenHistory.length === 0) {
+                tokenHistoryList.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fa fa-clock-o text-4xl mb-2 opacity-50"></i>
+                        <p class="text-sm">暂无Token历史记录</p>
+                    </div>
+                `;
+            } else {
+                tokenHistory.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-primary transition-colors cursor-pointer';
+                    historyItem.onclick = () => selectTokenFromHistory(item);
+                    
+                    historyItem.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 truncate" title="${item.token}">
+                                    ${maskToken(item.token)}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">${item.adminEmail}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">${item.timestamp}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 truncate" title="${item.apiDomain}">
+                            ${item.apiDomain}
+                        </p>
+                    `;
+                    
+                    tokenHistoryList.appendChild(historyItem);
+                });
+            }
+            
+            showModal('tokenHistoryModal');
+        }
+
+        // 从历史记录选择Token
+        function selectTokenFromHistory(tokenInfo) {
+            document.getElementById('apiDomain').value = tokenInfo.apiDomain;
+            originalToken = tokenInfo.token;
+            document.getElementById('accessToken').value = maskToken(originalToken);
+            document.getElementById('adminEmail').value = tokenInfo.adminEmail;
+            
+            updateApiStatus(true);
+            hideModal('tokenHistoryModal');
+            saveData();
+            log('系统', '从历史记录加载Token成功');
+            showToast('Token已加载成功（已加密显示）');
+        }
+
+        // 清空Token历史记录
+        function clearTokenHistory() {
+            if (confirm('确定要清空所有Token历史记录吗？')) {
+                tokenHistory = [];
+                saveData();
+                showTokenHistory();
+                log('系统', 'Token历史记录已清空');
+            }
+        }
+
+        // 复制Token
+        function copyToken() {
+            if (originalToken) {
+                navigator.clipboard.writeText(originalToken).then(() => {
+                    showToast('Token已复制到剪贴板');
+                    
+                    // 显示复制成功的视觉反馈
+                    const copyBtn = document.getElementById('copyTokenBtn');
+                    const originalIcon = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fa fa-check"></i>';
+                    copyBtn.style.color = '#10B981';
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalIcon;
+                        copyBtn.style.color = '';
+                    }, 2000);
+                    
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    showToast('复制失败，请手动复制');
+                });
+            } else {
+                showToast('没有Token可复制');
+            }
+        }
+
+        // 开始注册
+        async function startRegistration() {
+            if (isRegistering) {
+                showError('注册正在进行中，请稍候...');
+                return;
+            }
+            
+            try {
+                const apiDomain = document.getElementById('apiDomain').value.trim();
+                const accessToken = originalToken;
+                const emailDomain = document.getElementById('emailDomain').value.trim();
+                const registerCount = parseInt(document.getElementById('registerCount').value);
+                const usernamePrefix = document.getElementById('usernamePrefix').value.trim();
+                const roleName = document.getElementById('roleName').value.trim();
+                
+                if (!apiDomain || !accessToken || !emailDomain) {
+                    showError('请填写完整的API配置和注册信息');
+                    return;
+                }
+                
+                if (isNaN(registerCount) || registerCount < 1 || registerCount > 100) {
+                    showError('注册数量必须在1-100之间');
+                    return;
+                }
+                
+                isRegistering = true;
+                updateButtonStates();
+                showLoading('正在批量注册邮箱账号...');
+                
+                const startTime = Date.now();
+                const successfulAccounts = [];
+                const failedAccounts = [];
+                
+                for (let i = 0; i < registerCount; i++) {
+                    const progress = ((i + 1) / registerCount) * 100;
+                    updateLoadingProgress(progress);
+                    updateProgress(i + 1, registerCount);
+                    
+                    const username = generateUsername(usernamePrefix, i);
+                    const email = `${username}@${emailDomain}`;
+                    const password = generatePassword();
+                    
+                    try {
+                        // 模拟API调用延迟
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                        
+                        const success = await registerAccount(apiDomain, accessToken, email, password, roleName);
+                        
+                        if (success) {
+                            const account = {
+                                id: Date.now() + i,
+                                email: email,
+                                password: password,
+                                status: 'success',
+                                timestamp: new Date().toLocaleString()
+                            };
+                            successfulAccounts.push(account);
+                            registeredAccounts.unshift(account);
+                            addRecentResult(account, 'success');
+                            log('成功', `邮箱 ${email} 注册成功`);
+                        } else {
+                            throw new Error('注册失败');
+                        }
+                        
+                    } catch (error) {
+                        const account = {
+                            id: Date.now() + i,
+                            email: email,
+                            password: password,
+                            status: 'failed',
+                            error: error.message,
+                            timestamp: new Date().toLocaleString()
+                        };
+                        failedAccounts.push(account);
+                        registeredAccounts.unshift(account);
+                        addRecentResult(account, 'failed');
+                        log('失败', `邮箱 ${email} 注册失败: ${error.message}`);
+                    }
+                    
+                    // 更新状态消息
+                    updateStatusMessage(`正在注册第 ${i + 1}/${registerCount} 个账号`);
+                }
+                
+                const endTime = Date.now();
+                const totalTime = (endTime - startTime) / 1000;
+                
+                saveData();
+                updateDashboard();
+                updateResultsTable();
+                updateButtonStates();
+                
+                hideModal('loadingModal');
+                showSuccess(
+                    `批量注册完成！\n成功: ${successfulAccounts.length} 个\n失败: ${failedAccounts.length} 个\n总耗时: ${totalTime.toFixed(1)} 秒`,
+                    successfulAccounts.length > 0
+                );
+                
+                log('系统', `批量注册完成，成功 ${successfulAccounts.length} 个，失败 ${failedAccounts.length} 个`);
+                
+            } catch (error) {
+                console.error('注册过程失败:', error);
+                isRegistering = false;
+                updateButtonStates();
+                hideModal('loadingModal');
+                showError(`注册过程中发生错误: ${error.message}`);
+                log('错误', `批量注册失败: ${error.message}`);
+            }
+        }
+
+        // 注册单个账号
+        async function registerAccount(apiDomain, token, email, password, roleName) {
+            try {
+                const requestData = {
+                    list: [{
+                        email: email,
+                        password: password
+                    }]
+                };
+                
+                if (roleName) {
+                    requestData.list[0].roleName = roleName;
+                }
+                
+                const response = await fetch(`${apiDomain}/api/public/addUser`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText || '请求失败'}`);
+                }
+                
+                const data = await response.json();
+                return data.code === 200;
+                
+            } catch (error) {
+                console.error('账号注册失败:', error);
+                throw error;
+            }
+        }
+
+        // 生成用户名
+        function generateUsername(prefix, index) {
+            if (prefix) {
+                return `${prefix}${index + 1}`;
+            }
+            
+            const adjectives = ['happy', 'sunny', 'smart', 'brave', 'kind', 'calm', 'wise', 'cool'];
+            const nouns = ['user', 'mail', 'sky', 'star', 'moon', 'cloud', 'bird', 'tree'];
+            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+            const number = Math.floor(Math.random() * 1000);
+            
+            return `${adj}${noun}${number}`;
+        }
+
+        // 生成密码
+        function generatePassword() {
+            const length = parseInt(document.getElementById('passwordLength').value);
+            let charset = '';
+            
+            if (document.getElementById('includeUppercase').checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (document.getElementById('includeLowercase').checked) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (document.getElementById('includeNumbers').checked) charset += '0123456789';
+            if (document.getElementById('includeSymbols').checked) charset += '!@#$%^&*()_+{}[]|:;<>,.?/~`-=';
+            
+            if (charset === '') {
+                charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            }
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+            
+            return password;
+        }
+
+        // 更新进度
+        function updateProgress(current, total) {
+            const percent = (current / total) * 100;
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = `${current}/${total}`;
+            document.getElementById('progressPercent').textContent = `${Math.round(percent)}%`;
+        }
+
+        // 更新加载进度
+        function updateLoadingProgress(percent) {
+            const loadingProgress = document.getElementById('loadingProgress');
+            if (loadingProgress) {
+                loadingProgress.style.width = `${percent}%`;
+            }
+        }
+
+        // 更新状态消息
+        function updateStatusMessage(message) {
+            document.getElementById('statusMessage').textContent = message;
+        }
+
+        // 更新API状态
+        function updateApiStatus(connected) {
+            const apiStatusBadge = document.getElementById('apiStatusBadge');
+            if (connected) {
+                apiStatusBadge.className = 'badge badge-success';
+                apiStatusBadge.textContent = '已连接';
+            } else {
+                apiStatusBadge.className = 'badge badge-warning';
+                apiStatusBadge.textContent = '未连接';
+            }
+        }
+
+        // 添加最近结果
+        function addRecentResult(account, status) {
+            const recentResults = document.getElementById('recentResults');
+            
+            // 如果是第一条记录，清空占位符
+            if (recentResults.children.length === 1 && recentResults.children[0].textContent.includes('暂无注册记录')) {
+                recentResults.innerHTML = '';
+            }
+            
+            const resultItem = document.createElement('div');
+            resultItem.className = `flex items-center justify-between p-3 rounded-lg ${
+                status === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+            }`;
+            
+            resultItem.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${
+                        status === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                    }">
+                        <i class="fa fa-${status === 'success' ? 'check' : 'times'} text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium ${status === 'success' ? 'text-green-800' : 'text-red-800'}">${account.email}</p>
+                        <p class="text-xs ${status === 'success' ? 'text-green-600' : 'text-red-600'}">${account.password}</p>
+                    </div>
+                </div>
+                <span class="text-xs ${status === 'success' ? 'text-green-600' : 'text-red-600'}">
+                    ${account.timestamp.split(' ')[1]}
+                </span>
+            `;
+            
+            recentResults.insertBefore(resultItem, recentResults.firstChild);
+            
+            // 限制显示最近10条记录
+            while (recentResults.children.length > 10) {
+                recentResults.removeChild(recentResults.lastChild);
+            }
+        }
+
+        // 更新仪表板
+        function updateDashboard() {
+            const today = new Date().toLocaleDateString();
+            const todayAccounts = registeredAccounts.filter(account => 
+                account.timestamp.startsWith(today)
+            );
+            
+            const totalSuccess = registeredAccounts.filter(account => account.status === 'success').length;
+            const totalAttempted = registeredAccounts.length;
+            const successRate = totalAttempted > 0 ? Math.round((totalSuccess / totalAttempted) * 100) : 0;
+            
+            document.getElementById('todayCount').textContent = todayAccounts.length;
+            document.getElementById('totalCount').textContent = totalSuccess;
+            document.getElementById('successRate').textContent = `${successRate}%`;
+            
+            // 更新API状态
+            updateApiStatus(!!originalToken);
+        }
+
+        // 更新结果表格
+        function updateResultsTable() {
+            const filteredAccounts = getFilteredAccounts();
+            const resultsTable = document.getElementById('resultsTable');
+            
+            if (filteredAccounts.length === 0) {
+                resultsTable.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-gray-500">
+                            <i class="fa fa-search text-4xl mb-2 opacity-50"></i>
+                            <p>暂无数据</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            resultsTable.innerHTML = '';
+            filteredAccounts.forEach((account, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-100 hover:bg-gray-50 transition-colors';
+                
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-gray-600">${index + 1}</td>
+                    <td class="py-3 px-4 font-medium text-gray-900">${account.email}</td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-gray-600">${account.password}</span>
+                            <button onclick="copyText('${account.password}')" 
+                                    class="text-primary hover:text-primary/80 text-sm copy-btn">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="badge ${account.status === 'success' ? 'badge-success' : 'badge-error'}">
+                            ${account.status === 'success' ? '注册成功' : '注册失败'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-gray-600 text-sm">${account.timestamp}</td>
+                    <td class="py-3 px-4">
+                        <button onclick="copyAccountInfo('${account.email}', '${account.password}')" 
+                                class="text-secondary hover:text-secondary/80 text-sm mr-2 copy-btn">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                        <button onclick="deleteAccount(${account.id})" 
+                                class="text-red-500 hover:text-red-700 text-sm copy-btn">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                resultsTable.appendChild(row);
+            });
+        }
+
+        // 过滤结果
+        function filterResults() {
+            updateResultsTable();
+        }
+
+        // 获取过滤后的账号
+        function getFilteredAccounts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filterStatus = document.getElementById('filterSelect').value;
+            
+            return registeredAccounts.filter(account => {
+                const matchesSearch = account.email.toLowerCase().includes(searchTerm);
+                const matchesFilter = filterStatus === 'all' || account.status === filterStatus;
+                return matchesSearch && matchesFilter;
+            });
+        }
+
+        // 导出结果
+        function exportResults() {
+            const successAccounts = registeredAccounts.filter(account => account.status === 'success');
+            
+            if (successAccounts.length === 0) {
+                showError('没有成功注册的账号可导出');
+                return;
+            }
+            
+            try {
+                let csvContent = "邮箱地址,密码,注册时间\n";
+                
+                successAccounts.forEach(account => {
+                    csvContent += `${account.email},${account.password},${account.timestamp}\n`;
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `邮箱注册结果_${new Date().toLocaleDateString()}.csv`);
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                log('系统', `导出了 ${successAccounts.length} 个成功注册的账号`);
+                showToast('导出成功！');
+                
+            } catch (error) {
+                console.error('导出失败:', error);
+                showError('导出失败，请重试');
+                log('错误', `导出失败: ${error.message}`);
+            }
+        }
+
+        // 清空结果
+        function clearResults() {
+            if (confirm('确定要清空所有注册记录吗？此操作不可撤销！')) {
+                registeredAccounts = [];
+                document.getElementById('recentResults').innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fa fa-inbox text-4xl mb-2 opacity-50"></i>
+                        <p class="text-sm">暂无注册记录</p>
+                    </div>
+                `;
+                updateDashboard();
+                updateResultsTable();
+                updateButtonStates();
+                saveData();
+                log('系统', '清空了所有注册记录');
+            }
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('registerCount').value = 5;
+            document.getElementById('usernamePrefix').value = '';
+            document.getElementById('roleName').value = '';
+            document.getElementById('includeUppercase').checked = true;
+            document.getElementById('includeLowercase').checked = true;
+            document.getElementById('includeNumbers').checked = true;
+            document.getElementById('includeSymbols').checked = false;
+            document.getElementById('passwordLength').value = 10;
+            
+            updateProgress(0, 0);
+            updateStatusMessage('请先配置API并生成Token');
+            
+            log('系统', '表单已重置');
+        }
+
+        // 删除单个账号记录
+        function deleteAccount(accountId) {
+            if (confirm('确定要删除这条记录吗？')) {
+                const index = registeredAccounts.findIndex(account => account.id === accountId);
+                if (index !== -1) {
+                    const deletedAccount = registeredAccounts.splice(index, 1)[0];
+                    updateDashboard();
+                    updateResultsTable();
+                    updateButtonStates();
+                    saveData();
+                    log('系统', `删除了账号记录: ${deletedAccount.email}`);
+                }
+            }
+        }
+
+        // 更新按钮状态
+        function updateButtonStates() {
+            const hasResults = registeredAccounts.length > 0;
+            const exportBtn = document.getElementById('exportBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const startRegisterBtn = document.getElementById('startRegisterBtn');
+            
+            if (exportBtn) exportBtn.disabled = !hasResults;
+            if (clearBtn) clearBtn.disabled = !hasResults;
+            if (startRegisterBtn) startRegisterBtn.disabled = isRegistering;
+        }
+
+        // 复制文本
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                showToast('复制失败，请手动复制');
+            });
+        }
+
+        // 复制账号信息
+        function copyAccountInfo(email, password) {
+            const info = `邮箱: ${email}\n密码: ${password}`;
+            copyText(info);
+        }
+
+        // 显示加载模态框
+        function showLoading(message = '请稍候...') {
+            document.getElementById('loadingMessage').textContent = message;
+            document.getElementById('loadingModal').classList.add('show');
+            updateLoadingProgress(0);
+        }
+
+        // 显示成功模态框
+        function showSuccess(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successModal').classList.add('show');
+        }
+
+        // 显示错误模态框
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').classList.add('show');
+        }
+
+        // 显示模态框
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        // 隐藏模态框
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 隐藏所有模态框
+        function hideAllModals() {
+            const modals = ['loadingModal', 'successModal', 'errorModal', 'tokenHistoryModal', 'helpModal'];
+            modals.forEach(modalId => hideModal(modalId));
+        }
+
+        // 显示Toast通知
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 记录日志
+        function log(type, message) {
+            const logsContainer = document.getElementById('systemLogs');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry flex items-start space-x-2';
+            logEntry.innerHTML = `
+                <span class="text-gray-400">[${new Date().toLocaleTimeString()}]</span>
+                <span class="text-gray-600">${message}</span>
+            `;
+            
+            logsContainer.insertBefore(logEntry, logsContainer.firstChild);
+            
+            // 限制日志数量
+            while (logsContainer.children.length > 50) {
+                logsContainer.removeChild(logsContainer.lastChild);
+            }
+            
+            // 滚动到底部
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+
+        // 错误处理
+        window.addEventListener('error', (event) => {
+            console.error('JavaScript错误:', event.error);
+            showError('发生未知错误，请刷新页面重试');
+            log('错误', `JavaScript错误: ${event.error.message}`);
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('未处理的Promise拒绝:', event.reason);
+            showError('发生未知错误，请重试');
+            log('错误', `Promise拒绝: ${event.reason.message}`);
+        });
+    </script>
+</body>
+</html>
