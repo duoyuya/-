@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEON PASS | 赛博朋克密码加密终端</title>
+    <title>CyberCrypt - 赛博朋克密码加密系统</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
@@ -11,281 +11,462 @@
             theme: {
                 extend: {
                     colors: {
-                        neonCyan: '#00fff5',
-                        neonMagenta: '#ff00ff',
-                        neonYellow: '#ffff00',
-                        cyberBlack: '#0a0a1a',
-                        cyberGray: '#1e1e3f',
-                        cyberDark: '#121229',
+                        cyber: {
+                            pink: '#ff006e',
+                            blue: '#00f0ff',
+                            purple: '#8b00ff',
+                            yellow: '#ffff00',
+                            dark: '#0a0e27',
+                            darker: '#050814',
+                        }
                     },
                     fontFamily: {
-                        cyber: ['Rajdhani', 'Orbitron', 'monospace'],
+                        cyber: ['Orbitron', 'monospace'],
+                        mono: ['Share Tech Mono', 'monospace'],
                     },
-                    animation: {
-                        'fade-in': 'fadeIn 0.6s ease-out',
-                        'slide-up': 'slideUp 0.5s ease-out',
-                        'glow-pulse': 'glowPulse 1.5s ease-in-out infinite alternate',
-                        'glitch': 'glitch 2s infinite',
-                        'scanline': 'scanline 4s linear infinite',
-                        'neon-flicker': 'neonFlicker 0.5s infinite alternate',
-                        'text-flicker': 'textFlicker 3s linear infinite',
-                    }
                 }
             }
         }
     </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .content-auto {
-                content-visibility: auto;
-            }
-            .cyber-bg {
-                background: radial-gradient(circle at center, #121229 0%, #0a0a1a 100%);
-            }
-            .neon-border {
-                box-shadow: 0 0 5px #00fff5, 0 0 10px #00fff5, 0 0 15px #ff00ff, 0 0 20px #ff00ff;
-            }
-            .cyber-card {
-                background: rgba(30, 30, 63, 0.8);
-                border: 1px solid rgba(0, 255, 245, 0.3);
-            }
-            .scanline-effect::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: rgba(255, 255, 255, 0.1);
-                animation: scanline 4s linear infinite;
-                pointer-events: none;
-            }
-            .glitch-text {
-                position: relative;
-            }
-            .glitch-text::before, .glitch-text::after {
-                content: attr(data-text);
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-            .glitch-text::before {
-                left: 2px;
-                text-shadow: -2px 0 #ff00ff;
-                clip: rect(44px, 450px, 56px, 0);
-                animation: glitch-anim 5s infinite linear alternate-reverse;
-            }
-            .glitch-text::after {
-                left: -2px;
-                text-shadow: -2px 0 #00fff5;
-                clip: rect(44px, 450px, 56px, 0);
-                animation: glitch-anim2 5s infinite linear alternate-reverse;
-            }
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        body {
+            background: #0a0e27;
+            overflow-x: hidden;
+            font-family: 'Orbitron', monospace;
         }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes glowPulse {
-            from { box-shadow: 0 0 10px #00fff5, 0 0 20px #00fff5, 0 0 30px #ff00ff, 0 0 40px #ff00ff; }
-            to { box-shadow: 0 0 15px #00fff5, 0 0 25px #00fff5, 0 0 35px #ff00ff, 0 0 45px #ff00ff, 0 0 55px rgba(255, 0, 255, 0.5); }
-        }
-        
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-        
-        @keyframes scanline {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
-        
-        @keyframes neonFlicker {
-            from { opacity: 0.8; }
-            to { opacity: 1; box-shadow: 0 0 8px #00fff5, 0 0 12px #00fff5, 0 0 16px #ff00ff; }
-        }
-        
-        @keyframes textFlicker {
-            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 0.99; text-shadow: 0 0 5px #00fff5, 0 0 10px #00fff5, 0 0 15px #ff00ff; }
-            20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; text-shadow: none; }
-        }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(112px, 9999px, 149px, 0); }
-            20% { clip: rect(43px, 9999px, 20px, 0); }
-            40% { clip: rect(121px, 9999px, 54px, 0); }
-            60% { clip: rect(188px, 9999px, 153px, 0); }
-            80% { clip: rect(43px, 9999px, 45px, 0); }
-            100% { clip: rect(24px, 9999px, 44px, 0); }
-        }
-        
-        @keyframes glitch-anim2 {
-            0% { clip: rect(172px, 9999px, 130px, 0); }
-            20% { clip: rect(133px, 9999px, 166px, 0); }
-            40% { clip: rect(196px, 9999px, 13px, 0); }
-            60% { clip: rect(76px, 9999px, 107px, 0); }
-            80% { clip: rect(14px, 9999px, 166px, 0); }
-            100% { clip: rect(87px, 9999px, 73px, 0); }
-        }
-        
-        .password-strength-bar {
-            height: 4px;
-            transition: all 0.3s ease;
-        }
-        
-        .input-focus {
-            transition: all 0.3s ease;
-            background: rgba(30, 30, 63, 0.9) !important;
-        }
-        
-        .input-focus:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 0 8px #00fff5, 0 0 12px rgba(0, 255, 245, 0.5);
-            border-color: #00fff5 !important;
-        }
-        
-        .btn-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .btn-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 10px #00fff5, 0 0 15px #00fff5, 0 0 20px #ff00ff;
-        }
-        
-        .btn-hover:active {
-            transform: translateY(0);
-            box-shadow: 0 0 8px #00fff5, 0 0 12px #ff00ff;
-        }
-        
-        /* 数字雨背景效果 */
-        .digital-rain {
+
+        /* 赛博朋克网格背景 */
+        .cyber-grid {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
             pointer-events: none;
-            z-index: 0;
-            opacity: 0.15;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* 霓虹光效 */
+        .neon-text {
+            text-shadow: 
+                0 0 10px #00f0ff,
+                0 0 20px #00f0ff,
+                0 0 30px #00f0ff,
+                0 0 40px #ff006e,
+                0 0 70px #ff006e,
+                0 0 80px #ff006e,
+                0 0 100px #ff006e;
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                opacity: 0.8;
+            }
+        }
+
+        .neon-border {
+            border: 2px solid #00f0ff;
+            box-shadow: 
+                0 0 5px #00f0ff,
+                0 0 10px #00f0ff,
+                inset 0 0 10px rgba(0, 240, 255, 0.2);
+            position: relative;
+        }
+
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff006e, #00f0ff, #8b00ff, #ffff00);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            filter: blur(10px);
+        }
+
+        .neon-border:hover::before {
+            opacity: 1;
+        }
+
+        /* 扫描线效果 */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(0, 240, 255, 0.1) 50%,
+                transparent 100%
+            );
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* 故障效果 */
+        .glitch {
+            position: relative;
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            91% { transform: translate(-2px, 2px); }
+            92% { transform: translate(2px, -2px); }
+            93% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+        }
+
+        /* 输入框赛博风格 */
+        .cyber-input {
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid #00f0ff;
+            color: #00f0ff;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .cyber-input:focus {
+            outline: none;
+            border-color: #ff006e;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 110, 0.5),
+                inset 0 0 20px rgba(0, 240, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .cyber-input::placeholder {
+            color: rgba(0, 240, 255, 0.5);
+        }
+
+        /* 按钮赛博风格 */
+        .cyber-btn {
+            background: linear-gradient(45deg, #ff006e, #8b00ff);
+            border: 2px solid #00f0ff;
+            color: #fff;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .cyber-btn:hover::before {
+            left: 100%;
+        }
+
+        .cyber-btn:hover {
+            box-shadow: 
+                0 0 20px #ff006e,
+                0 0 40px #8b00ff,
+                inset 0 0 20px rgba(0, 240, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .cyber-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 卡片容器 */
+        .cyber-card {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.9), rgba(139, 0, 255, 0.1));
+            backdrop-filter: blur(20px);
+            border: 2px solid #00f0ff;
+            box-shadow: 
+                0 0 30px rgba(0, 240, 255, 0.3),
+                inset 0 0 30px rgba(255, 0, 110, 0.1);
+        }
+
+        /* 密码强度条 */
+        .strength-bar {
+            height: 6px;
+            background: linear-gradient(90deg, #ff006e, #ffff00, #00f0ff);
+            box-shadow: 0 0 10px currentColor;
+            transition: all 0.3s;
+        }
+
+        /* 浮动粒子 */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #00f0ff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 10s infinite;
+            box-shadow: 0 0 10px #00f0ff;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translate(100vw, -100vh) rotate(360deg);
+            }
+        }
+
+        /* 六边形装饰 */
+        .hexagon {
+            width: 100px;
+            height: 57.735px;
+            background: rgba(0, 240, 255, 0.1);
+            position: absolute;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            animation: rotate 20s linear infinite;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 脉冲动画 */
+        .pulse-cyber {
+            animation: pulseCyber 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseCyber {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 0, 110, 0.8), 0 0 60px rgba(255, 0, 110, 0.5);
+            }
+        }
+
+        /* 数据流效果 */
+        .data-stream {
+            position: fixed;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #00f0ff;
+            opacity: 0.3;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: streamFlow 15s linear infinite;
+        }
+
+        @keyframes streamFlow {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateX(100vw);
+                opacity: 0;
+            }
+        }
+
+        /* 结果容器特效 */
+        .result-glow {
+            animation: resultGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes resultGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 10px rgba(0, 240, 255, 0.5),
+                    inset 0 0 10px rgba(255, 0, 110, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 0 30px rgba(255, 0, 110, 0.8),
+                    inset 0 0 20px rgba(0, 240, 255, 0.4);
+            }
+        }
+
+        /* Logo图标动画 */
+        .logo-icon {
+            animation: logoSpin 10s linear infinite;
+            filter: drop-shadow(0 0 20px #00f0ff);
+        }
+
+        @keyframes logoSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* 通知样式 */
+        .cyber-notification {
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.9), rgba(139, 0, 255, 0.9));
+            border: 2px solid #00f0ff;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        /* 加载动画 */
+        .cyber-loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #00f0ff;
+            border-top-color: #ff006e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 角落装饰 */
+        .corner-decoration {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00f0ff;
+        }
+
+        .corner-decoration.top-left {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-decoration.top-right {
+            top: -2px;
+            right: -2px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-decoration.bottom-left {
+            bottom: -2px;
+            left: -2px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-decoration.bottom-right {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
         }
     </style>
-    <!-- 引入赛博朋克风格字体 -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-screen cyber-bg font-cyber overflow-x-hidden scanline-effect">
-    <!-- 数字雨背景 -->
-    <div class="digital-rain" id="digitalRain"></div>
+<body>
+    <!-- 网格背景 -->
+    <div class="cyber-grid"></div>
+    
+    <!-- 扫描线 -->
+    <div class="scanline"></div>
 
-    <!-- 背景装饰元素 -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div class="absolute -top-40 -right-40 w-80 h-80 bg-neonMagenta/20 rounded-full blur-3xl animate-pulse" style="animation-duration: 4s;"></div>
-        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-neonCyan/20 rounded-full blur-3xl animate-pulse" style="animation-duration: 6s; animation-delay: 1s;"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-neonYellow/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 5s; animation-delay: 2s;"></div>
-        
-        <!-- 网格线 -->
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#00fff51px,transparent_1px),linear-gradient(to_bottom,#00fff51px,transparent_1px)] bg-[size:40px_40px] opacity-10"></div>
-    </div>
+    <!-- 浮动粒子 -->
+    <div id="particles"></div>
+
+    <!-- 数据流 -->
+    <div class="data-stream" style="top: 10%;">01001000 01000101 01001100 01001100 01001111 00100000 01010111 01001111 01010010 01001100 01000100</div>
+    <div class="data-stream" style="top: 30%; animation-delay: 5s;">CYBERPUNK 2077 :: NEURAL NETWORK ENCRYPTION :: QUANTUM SECURITY</div>
+    <div class="data-stream" style="top: 50%; animation-delay: 10s;">FIREWALL ACTIVE :: SECURE CONNECTION ESTABLISHED :: DATA ENCRYPTION IN PROGRESS</div>
+    <div class="data-stream" style="top: 70%; animation-delay: 3s;">ACCESS GRANTED :: LEVEL 5 CLEARANCE :: INITIATING CYBERWARE PROTOCOL</div>
+    <div class="data-stream" style="top: 90%; animation-delay: 7s;">MAINFRAME STATUS: ONLINE :: GHOST IN THE SHELL :: MATRIX ENCRYPTION</div>
+
+    <!-- 六边形装饰 -->
+    <div class="hexagon" style="top: 5%; left: 10%; animation-delay: 0s;"></div>
+    <div class="hexagon" style="top: 15%; right: 15%; animation-delay: 3s;"></div>
+    <div class="hexagon" style="bottom: 10%; left: 5%; animation-delay: 6s;"></div>
+    <div class="hexagon" style="bottom: 20%; right: 10%; animation-delay: 9s;"></div>
 
     <!-- 主容器 -->
-    <div class="relative min-h-screen flex items-center justify-center p-4 z-10">
-        <!-- 卡片容器 -->
-        <div class="w-full max-w-md">
+    <div class="relative min-h-screen flex items-center justify-center p-4 py-12">
+        <div class="w-full max-w-xl z-10">
             <!-- 标题区域 -->
-            <div class="text-center mb-8 animate-fade-in">
-                <div class="inline-flex items-center justify-center w-20 h-20 cyber-card rounded-2xl mb-6 neon-border bg-cyberDark">
-                    <<i class="fa fa-shield text-neonCyan text-3xl animate-neon-flicker"></</i>
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center justify-center w-24 h-24 relative mb-6">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyber-pink to-cyber-blue rounded-full opacity-20 blur-xl pulse-cyber"></div>
+                    <i class="fa fa-shield text-6xl text-cyber-blue logo-icon relative z-10"></i>
                 </div>
-                <h1 class="text-5xl font-extrabold glitch-text" data-text="NEON PASS">
-                    <span class="text-white animate-text-flicker">NEON PASS</span>
+                <h1 class="text-6xl font-black text-white mb-3 glitch neon-text tracking-wider">
+                    CYBERCRYPT
                 </h1>
-                <p class="text-neonCyan text-xl mt-4 tracking-widest">密码加密终端 v2.0</p>
-                <div class="w-32 h-1 bg-gradient-to-r from-neonCyan to-neonMagenta mx-auto mt-6 rounded-full animate-glow-pulse"></div>
+                <p class="text-cyber-blue text-lg tracking-widest font-mono uppercase">
+                    <span class="inline-block mr-2">▸</span>
+                    Neural Password Encryption System
+                    <span class="inline-block ml-2">◂</span>
+                </p>
+                <div class="flex items-center justify-center gap-2 mt-4">
+                    <div class="w-12 h-1 bg-gradient-to-r from-transparent via-cyber-pink to-transparent"></div>
+                    <div class="w-2 h-2 bg-cyber-blue rounded-full animate-pulse"></div>
+                    <div class="w-32 h-1 bg-gradient-to-r from-cyber-pink via-cyber-purple to-cyber-blue"></div>
+                    <div class="w-2 h-2 bg-cyber-pink rounded-full animate-pulse" style="animation-delay: 0.5s;"></div>
+                    <div class="w-12 h-1 bg-gradient-to-r from-transparent via-cyber-blue to-transparent"></div>
+                </div>
             </div>
 
             <!-- 加密卡片 -->
-            <div class="cyber-card rounded-3xl p-8 neon-border animate-slide-up relative overflow-hidden">
-                <!-- 卡片装饰线 -->
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-neonCyan to-neonMagenta"></div>
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neonMagenta to-neonCyan"></div>
-                
-                <form id="encryptionForm" class="space-y-6">
+            <div class="cyber-card rounded-3xl p-8 relative mb-6">
+                <!-- 角落装饰 -->
+                <div class="corner-decoration top-left"></div>
+                <div class="corner-decoration top-right"></div>
+                <div class="corner-decoration bottom-left"></div>
+                <div class="corner-decoration bottom-right"></div>
+
+                <form id="encryptionForm" class="space-y-8">
                     <!-- ENCRYPTION_KEY输入 -->
-                    <div class="space-y-3">
-                        <label class="flex items-center text-neonCyan font-medium text-lg">
-                            <<i class="fa fa-key mr-3 text-neonMagenta animate-neon-flicker"></</i>
-                            加密密钥 <span class="text-white/60 text-sm ml-2">(ENCRYPTION_KEY)</span>
+                    <div class="space-y-4">
+                        <label class="flex items-center text-cyber-blue font-bold uppercase tracking-wider text-sm">
+                            <i class="fa fa-key mr-3 text-cyber-yellow text-lg"></i>
+                            <span class="mr-2">◆</span>
+                            Encryption Key
+                            <span class="ml-2">◆</span>
                         </label>
                         <div class="relative">
-                            <input 
-                                type="password" 
-                                id="encryptionKey" 
-                                placeholder="输入6-32位密钥" 
-                                required
-                                class="w-full px-6 py-4 bg-cyberGray border border-neonCyan/50 rounded-2xl text-white placeholder-neonCyan/40 input-focus"
-                            >
-                            <button type="button" onclick="togglePassword('encryptionKey')" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-neonCyan/70 hover:text-neonCyan transition-colors">
-                                <<i class="fa fa-eye-slash text-xl" id="toggleKeyIcon"></</i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 明文密码输入 -->
-                    <div class="space-y-3">
-                        <label class="flex items-center justify-between text-neonCyan font-medium text-lg">
-                            <div class="flex items-center">
-                                <<i class="fa fa-lock mr-3 text-neonYellow animate-neon-flicker"></</i>
-                                明文密码
-                            </div>
-                            <span id="passwordStrengthText" class="text-neonYellow/80 text-sm tracking-wider">强度: 弱</span>
-                        </label>
-                        <div class="relative">
-                            <input 
-                                type="password" 
-                                id="rawPassword" 
-                                placeholder="输入待加密密码" 
-                                required
-                                oninput="checkPasswordStrength(this.value)"
-                                class="w-full px-6 py-4 bg-cyberGray border border-neonCyan/50 rounded-2xl text-white placeholder-neonCyan/40 input-focus"
-                            >
-                            <button type="button" onclick="togglePassword('rawPassword')" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-neonCyan/70 hover:text-neonCyan transition-colors">
-                                <<i class="fa fa-eye-slash text-xl" id="togglePasswordIcon"></</i>
-                            </button>
-                        </div>
-                        <!-- 密码强度条 -->
-                        <div class="w-full bg-cyberDark rounded-full h-2 border border-neonCyan/30">
-                            <div id="passwordStrengthBar" class="password-strength-bar bg-neonMagenta rounded-full w-0"></div>
-                        </div>
-                    </div>
-
-                    <!-- 操作按钮 -->
-                    <div class="flex space-x-4 mt-8">
-                        <button 
-                            type="button" 
-                            onclick="clearForm()"
-                            class="flex-1 px-6 py-4 bg-cyberDark border border-neonCyan/50 rounded-2xl text-neonCyan hover:border-neonCyan transition-all duration-300 btn-hover font-medium text-lg"
-                        >
-                            <<i class="fa fa-eraser mr-2"></</i>
-                            清空
-                        </button>
-                        <button 
-                            type="submit" 
-                            id="encryptBtn"
-                            class="flex-1 px-6 py-4 bg-gradient-to-r from-neonCyan to-neonMagenta text-white rounded-2xl font-medium text-lg btn-hover animate-glow-pulse"
-                        >
-                            <<i class="fa fa-bolt mr-2"></</i>
-                            <span id="encryptBtnText">
+                            <input
