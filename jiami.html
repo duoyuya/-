@@ -22,6 +22,8 @@
                         cyber: ['Rajdhani', 'Orbitron', 'monospace'],
                     },
                     animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
                         'glow-pulse': 'glowPulse 1.5s ease-in-out infinite alternate',
                         'glitch': 'glitch 2s infinite',
                         'scanline': 'scanline 4s linear infinite',
@@ -81,6 +83,16 @@
                 clip: rect(44px, 450px, 56px, 0);
                 animation: glitch-anim2 5s infinite linear alternate-reverse;
             }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @keyframes glowPulse {
@@ -186,7 +198,7 @@
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-neonYellow/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 5s; animation-delay: 2s;"></div>
         
         <!-- 网格线 -->
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#00fff51px,transparent_1px),linear-gradient(to_bottom,#00fff51px,transparent_1px)] bg-[size:40px_40px] opacity: 0.1;"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#00fff51px,transparent_1px),linear-gradient(to_bottom,#00fff51px,transparent_1px)] bg-[size:40px_40px] opacity-10"></div>
     </div>
 
     <!-- 主容器 -->
@@ -276,13 +288,4 @@
                             class="flex-1 px-6 py-4 bg-gradient-to-r from-neonCyan to-neonMagenta text-white rounded-2xl font-medium text-lg btn-hover animate-glow-pulse"
                         >
                             <<i class="fa fa-bolt mr-2"></</i>
-                            <span id="encryptBtnText">加密</span>
-                            <<i class="fa fa-spinner fa-spin ml-2 hidden" id="loadingSpinner"></</i>
-                        </button>
-                    </div>
-                </form>
-
-                <!-- 结果显示区域 -->
-                <div id="resultContainer" class="mt-8 space-y-4 hidden">
-                    <div class="flex items-center justify-between text-neonCyan font-medium mb-3">
-                        <span class="text-lg"><<i class="fa fa
+                            <span id="encryptBtnText">
