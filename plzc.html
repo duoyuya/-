@@ -109,6 +109,26 @@
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
         }
         
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: #DC2626;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+        
         .input-field {
             width: 100%;
             padding: 14px 16px;
@@ -507,7 +527,7 @@
                 padding: 12px;
             }
             
-            .btn-primary, .btn-secondary {
+            .btn-primary, .btn-secondary, .btn-danger {
                 padding: 12px 16px;
                 font-size: 14px;
             }
@@ -532,7 +552,7 @@
                 padding: 10px;
             }
             
-            .btn-primary, .btn-secondary {
+            .btn-primary, .btn-secondary, .btn-danger {
                 padding: 10px 14px;
                 font-size: 13px;
             }
@@ -593,7 +613,7 @@
                     </div>
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">邮箱批量注册系统</h1>
-                        <p class="text-xs text-gray-500">北沐版 v1.4</p>
+                        <p class="text-xs text-gray-500">北沐版 v1.8</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -797,25 +817,83 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">
-                                                用户名长度 <span class="text-red-500">*</span>
+                                                基础长度 <span class="text-red-500">*</span>
                                             </label>
                                             <input type="number" id="usernameLength" min="1" max="20" value="6"
                                                    class="input-field input-number">
-                                            <span class="form-hint">不含前缀的基础长度(1-20位)</span>
-                                        </div>
-                                        <div class="form-group flex items-center">
-                                            <div class="mode-badge">
-                                                <i class="fa fa-random"></i>
-                                                <span>完全随机模式</span>
-                                            </div>
+                                            <span class="form-hint">字母部分的长度(1-20位)</span>
                                         </div>
                                     </div>
                                     
+                                    <!-- 生成模式选择 -->
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            生成模式 <span class="text-red-500">*</span>
+                                        </label>
+                                        <select id="generationMode" class="input-field" onchange="updatePatternOptions()">
+                                            <option value="random">完全随机</option>
+                                            <option value="letters_numbers">字母+数字</option>
+                                            <option value="numbers_letters">数字+字母</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- 数字部分设置 -->
+                                    <div id="numberSettings" class="config-group" style="background: #f0f9ff;">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    数字部分
+                                                </label>
+                                                <select id="numberMode" class="input-field" onchange="updatePatternOptions()">
+                                                    <option value="random">随机数字</option>
+                                                    <option value="pattern">规律模式</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    数字长度
+                                                </label>
+                                                <input type="number" id="numberLength" min="1" max="10" value="3"
+                                                       class="input-field input-number">
+                                                <span class="form-hint" id="numberLengthHint">设置数字部分的长度</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 规律模式选项 -->
+                                        <div id="patternOptions" class="form-row" style="display: none;">
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    规律模式
+                                                </label>
+                                                <select id="patternType" class="input-field" onchange="updatePatternOptions()">
+                                                    <option value="student_id">学号模式</option>
+                                                    <option value="date">日期模式</option>
+                                                    <option value="incremental">递增模式</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="startValueGroup">
+                                                <label class="form-label">
+                                                    起始值 <span class="text-red-500">*</span>
+                                                </label>
+                                                <input type="text" id="startValue" value="1001"
+                                                       class="input-field">
+                                                <span class="form-hint" id="startValueHint">学号/递增起始值，决定数字长度</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 总长度预览 -->
+                                        <div id="totalLengthPreview" class="mt-4 p-3 bg-blue-50 rounded-lg text-sm">
+                                            <span class="font-medium text-blue-800">总长度预览：</span>
+                                            <span id="totalLengthText" class="text-blue-600">基础长度(6) + 数字长度(3) = 9位</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 字符类型选择 -->
                                     <div>
                                         <label class="form-label">
                                             字符类型选择
                                         </label>
-                                        <div class="checkbox-group">
+                                        <div id="characterTypes" class="checkbox-group">
                                             <label class="checkbox-item">
                                                 <input type="checkbox" id="includeUsernameUppercase" checked
                                                        class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
@@ -1001,6 +1079,12 @@
                             <option value="success">注册成功</option>
                             <option value="failed">注册失败</option>
                         </select>
+                        <button id="deleteAllBtn" 
+                                class="btn-danger" 
+                                onclick="confirmDeleteAll()" disabled>
+                            <i class="fa fa-trash mr-2"></i>
+                            删除全部
+                        </button>
                     </div>
                 </div>
                 
@@ -1107,6 +1191,25 @@
         </div>
     </div>
 
+    <!-- 确认删除模态框 -->
+    <div id="confirmDeleteModal" class="modal">
+        <div class="modal-content p-8 text-center">
+            <div class="inline-block p-4 bg-red-50 rounded-full mb-4">
+                <i class="fa fa-exclamation-triangle text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">确认删除</h3>
+            <p id="confirmDeleteMessage" class="text-gray-600 mb-6">确定要删除所有注册记录吗？此操作不可撤销！</p>
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="hideModal('confirmDeleteModal')">
+                    取消
+                </button>
+                <button class="btn-danger" onclick="deleteAllRecords()">
+                    确认删除
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 帮助模态框 -->
     <div id="helpModal" class="modal">
         <div class="modal-content p-8 max-h-[80vh] overflow-y-auto">
@@ -1131,10 +1234,24 @@
                 <div>
                     <h4 class="font-semibold text-gray-900 mb-2">3. 用户名配置</h4>
                     <ul class="text-gray-600 space-y-1">
-                        <li>• 用户名长度：1-20位可选择（不含前缀的基础长度）</li>
-                        <li>• 字符类型：可选择包含大写字母、小写字母、数字、特殊符号</li>
-                        <li>• 前缀支持：可选，如设置前缀会在前缀后添加随机字符</li>
-                        <li>• 生成模式：固定为完全随机模式</li>
+                        <li>• 基础长度：字母部分的长度（1-20位）</li>
+                        <li>• 数字长度：数字部分的长度（1-10位）</li>
+                        <li>• 总长度 = 基础长度 + 数字长度</li>
+                        <li>• 生成模式：
+                            <ul class="ml-4 mt-1 space-y-1">
+                                <li>完全随机：纯随机字符组合（基础长度即为总长度）</li>
+                                <li>字母+数字：字母开头，数字结尾（总长度=基础长度+数字长度）</li>
+                                <li>数字+字母：数字开头，字母结尾（总长度=数字长度+基础长度）</li>
+                            </ul>
+                        </li>
+                        <li>• 规律模式说明：
+                            <ul class="ml-4 mt-1 space-y-1">
+                                <li>学号模式：需要设置起始值，按顺序递增</li>
+                                <li>日期模式：使用当前日期，不需要起始值</li>
+                                <li>递增模式：需要设置起始值，简单递增</li>
+                            </ul>
+                        </li>
+                        <li>• 前缀支持：可选，会添加在最前面</li>
                     </ul>
                 </div>
                 
@@ -1144,7 +1261,12 @@
                 </div>
                 
                 <div>
-                    <h4 class="font-semibold text-gray-900 mb-2">5. 常见问题</h4>
+                    <h4 class="font-semibold text-gray-900 mb-2">5. 数据管理</h4>
+                    <p class="text-gray-600">可以通过"删除全部"按钮一次性删除所有注册记录，也可以通过每条记录后面的删除按钮单独删除。所有操作都会立即生效并保存到本地存储。</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">6. 常见问题</h4>
                     <ul class="text-gray-600 space-y-1">
                         <li>• Token生成失败：检查网络连接和API配置</li>
                         <li>• 注册失败：检查Token是否有效，API是否正常</li>
@@ -1181,11 +1303,21 @@
                 updateDashboard();
                 updateResultsTable();
                 updateButtonStates();
+                updatePatternOptions(); // 初始化模式选项
+                updateTotalLengthPreview(); // 初始化总长度预览
                 
                 // 添加事件监听器
                 document.getElementById('searchInput').addEventListener('input', filterResults);
                 document.getElementById('filterSelect').addEventListener('change', filterResults);
                 document.getElementById('helpBtn').addEventListener('click', () => showModal('helpModal'));
+                
+                // 添加长度变化监听器
+                document.getElementById('usernameLength').addEventListener('input', updateTotalLengthPreview);
+                document.getElementById('numberLength').addEventListener('input', updateTotalLengthPreview);
+                document.getElementById('startValue').addEventListener('input', () => {
+                    updateNumberLengthFromStartValue();
+                    updateTotalLengthPreview();
+                });
                 
                 // 点击模态框外部关闭
                 document.addEventListener('click', (e) => {
@@ -1240,9 +1372,15 @@
                     console.log('表单数据加载完成');
                 }
                 
-                // 设置默认的用户名长度为6
+                // 设置默认值
                 if (!document.getElementById('usernameLength').value) {
                     document.getElementById('usernameLength').value = '6';
+                }
+                if (!document.getElementById('numberLength').value) {
+                    document.getElementById('numberLength').value = '3';
+                }
+                if (!document.getElementById('startValue').value) {
+                    document.getElementById('startValue').value = '1001';
                 }
                 
             } catch (error) {
@@ -1265,6 +1403,11 @@
                     emailDomain: document.getElementById('emailDomain').value,
                     usernamePrefix: document.getElementById('usernamePrefix').value,
                     usernameLength: document.getElementById('usernameLength').value,
+                    generationMode: document.getElementById('generationMode').value,
+                    numberMode: document.getElementById('numberMode').value,
+                    numberLength: document.getElementById('numberLength').value,
+                    patternType: document.getElementById('patternType').value,
+                    startValue: document.getElementById('startValue').value,
                     roleName: document.getElementById('roleName').value
                 };
                 localStorage.setItem('formData', JSON.stringify(formData));
@@ -1509,6 +1652,347 @@
             }
         }
 
+        // 更新模式选项显示 - 优化日期模式
+        function updatePatternOptions() {
+            const generationMode = document.getElementById('generationMode').value;
+            const numberSettings = document.getElementById('numberSettings');
+            const patternOptions = document.getElementById('patternOptions');
+            const numberMode = document.getElementById('numberMode').value;
+            const numberLength = document.getElementById('numberLength');
+            const numberLengthHint = document.getElementById('numberLengthHint');
+            const startValue = document.getElementById('startValue');
+            const startValueGroup = document.getElementById('startValueGroup');
+            const startValueHint = document.getElementById('startValueHint');
+            const patternType = document.getElementById('patternType').value;
+            
+            // 根据生成模式显示/隐藏数字设置
+            if (generationMode === 'letters_numbers' || generationMode === 'numbers_letters') {
+                numberSettings.style.display = 'block';
+            } else {
+                numberSettings.style.display = 'none';
+            }
+            
+            // 根据数字模式更新数字长度的可用性和提示
+            if (numberMode === 'pattern') {
+                patternOptions.style.display = 'flex';
+                
+                // 根据规律模式类型更新起始值的显示
+                if (patternType === 'date') {
+                    // 日期模式：隐藏起始值输入框
+                    startValueGroup.style.display = 'none';
+                    // 日期模式的数字长度固定为8位（年月日+序号）
+                    numberLength.value = 8;
+                    numberLength.disabled = true;
+                    numberLengthHint.textContent = '日期模式固定8位（年月日+序号）';
+                } else {
+                    // 其他规律模式：显示起始值输入框
+                    startValueGroup.style.display = 'block';
+                    numberLength.disabled = true;
+                    numberLengthHint.textContent = '规律模式下数字长度由起始值决定';
+                    
+                    // 更新起始值提示
+                    if (patternType === 'student_id') {
+                        startValueHint.textContent = '学号起始值，决定数字长度';
+                    } else { // incremental
+                        startValueHint.textContent = '递增起始值，决定数字长度';
+                    }
+                    
+                    // 根据起始值自动设置数字长度
+                    if (startValue.value) {
+                        numberLength.value = startValue.value.length;
+                    }
+                }
+            } else {
+                patternOptions.style.display = 'none';
+                numberLength.disabled = false;
+                numberLengthHint.textContent = '设置数字部分的长度';
+            }
+            
+            // 更新字符类型选项
+            updateCharacterTypeOptions();
+            
+            // 更新总长度预览
+            updateTotalLengthPreview();
+        }
+
+        // 更新字符类型选项
+        function updateCharacterTypeOptions() {
+            const generationMode = document.getElementById('generationMode').value;
+            const includeNumbers = document.getElementById('includeUsernameNumbers');
+            
+            // 根据生成模式自动勾选或禁用数字选项
+            switch (generationMode) {
+                case 'letters_numbers':
+                case 'numbers_letters':
+                    includeNumbers.checked = true;
+                    includeNumbers.disabled = true;
+                    break;
+                default: // random
+                    includeNumbers.disabled = false;
+                    break;
+            }
+        }
+
+        // 监听起始值变化，自动更新数字长度
+        function updateNumberLengthFromStartValue() {
+            const startValue = document.getElementById('startValue').value;
+            const numberLength = document.getElementById('numberLength');
+            const numberMode = document.getElementById('numberMode').value;
+            const patternType = document.getElementById('patternType').value;
+            
+            if (numberMode === 'pattern' && patternType !== 'date' && startValue) {
+                numberLength.value = startValue.length;
+            }
+        }
+
+        // 更新总长度预览
+        function updateTotalLengthPreview() {
+            const generationMode = document.getElementById('generationMode').value;
+            const usernameLength = parseInt(document.getElementById('usernameLength').value) || 0;
+            const numberLength = parseInt(document.getElementById('numberLength').value) || 0;
+            const totalLengthPreview = document.getElementById('totalLengthPreview');
+            const totalLengthText = document.getElementById('totalLengthText');
+            const patternType = document.getElementById('patternType').value;
+            
+            if (generationMode === 'letters_numbers' || generationMode === 'numbers_letters') {
+                const totalLength = usernameLength + numberLength;
+                
+                if (patternType === 'date') {
+                    totalLengthText.textContent = `基础长度(${usernameLength}) + 日期(8位) = ${totalLength}位`;
+                } else {
+                    totalLengthText.textContent = `基础长度(${usernameLength}) + 数字长度(${numberLength}) = ${totalLength}位`;
+                }
+                
+                totalLengthPreview.style.display = 'block';
+            } else if (generationMode === 'random') {
+                totalLengthText.textContent = `总长度 = 基础长度(${usernameLength})`;
+                totalLengthPreview.style.display = 'block';
+            } else {
+                totalLengthPreview.style.display = 'none';
+            }
+        }
+
+        // 获取用户名配置
+        function getUsernameConfig() {
+            const includeUppercase = document.getElementById('includeUsernameUppercase').checked;
+            const includeLowercase = document.getElementById('includeUsernameLowercase').checked;
+            const includeNumbers = document.getElementById('includeUsernameNumbers').checked;
+            const includeSymbols = document.getElementById('includeUsernameSymbols').checked;
+            const generationMode = document.getElementById('generationMode').value;
+            
+            // 根据生成模式自动调整配置
+            let effectiveConfig = {
+                includeUppercase: includeUppercase,
+                includeLowercase: includeLowercase,
+                includeNumbers: includeNumbers,
+                includeSymbols: includeSymbols,
+                generationMode: generationMode,
+                numberMode: document.getElementById('numberMode').value,
+                numberLength: parseInt(document.getElementById('numberLength').value) || 0,
+                patternType: document.getElementById('patternType').value,
+                startValue: document.getElementById('startValue').value
+            };
+            
+            // 验证配置
+            if (generationMode === 'letters_numbers' || generationMode === 'numbers_letters') {
+                effectiveConfig.includeNumbers = true;
+            }
+            
+            // 验证至少选择一种字符类型
+            let hasLetters = effectiveConfig.includeUppercase || effectiveConfig.includeLowercase;
+            let hasNumbers = effectiveConfig.includeNumbers;
+            
+            if (generationMode === 'letters_numbers') {
+                if (!hasLetters) {
+                    return {
+                        valid: false,
+                        error: '请至少选择一种字母类型（大写或小写）'
+                    };
+                }
+            } else if (generationMode === 'numbers_letters') {
+                if (!hasNumbers || !hasLetters) {
+                    return {
+                        valid: false,
+                        error: '数字+字母模式需要同时选择字母和数字'
+                    };
+                }
+            } else if (!hasLetters && !hasNumbers && !effectiveConfig.includeSymbols) {
+                return {
+                    valid: false,
+                    error: '请至少选择一种字符类型'
+                };
+            }
+            
+            // 验证规律模式的起始值（除了日期模式）
+            if (effectiveConfig.numberMode === 'pattern' && 
+                effectiveConfig.patternType !== 'date' && 
+                !effectiveConfig.startValue) {
+                return {
+                    valid: false,
+                    error: '规律模式需要设置起始值'
+                };
+            }
+            
+            return {
+                valid: true,
+                ...effectiveConfig
+            };
+        }
+
+        // 生成规律数字 - 优化日期模式
+        function generatePatternNumber(patternType, index) {
+            switch (patternType) {
+                case 'student_id':
+                    // 学号模式：固定长度，前面补0
+                    const startValue = document.getElementById('startValue').value;
+                    const startNum = parseInt(startValue);
+                    const currentValue = startNum + index;
+                    const numberLength = startValue.length;
+                    return currentValue.toString().padStart(numberLength, '0');
+                    
+                case 'date':
+                    // 日期模式：年+月+日+序号（不需要起始值）
+                    const date = new Date();
+                    const year = date.getFullYear().toString().substr(-2);
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const day = date.getDate().toString().padStart(2, '0');
+                    // 序号部分从1开始，3位数字
+                    const sequence = (index + 1).toString().padStart(3, '0');
+                    return year + month + day + sequence;
+                    
+                case 'incremental':
+                default:
+                    // 递增模式：简单递增数字
+                    const startNum2 = parseInt(document.getElementById('startValue').value);
+                    const currentValue2 = startNum2 + index;
+                    return currentValue2.toString();
+            }
+        }
+
+        // 生成随机字母
+        function generateRandomLetters(length, includeUppercase, includeLowercase) {
+            let charset = '';
+            if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+            
+            if (charset === '') {
+                charset = 'abcdefghijklmnopqrstuvwxyz'; // 默认小写字母
+            }
+            
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                result += charset[randomIndex];
+            }
+            
+            return result;
+        }
+
+        // 生成随机数字
+        function generateRandomNumbers(length) {
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += Math.floor(Math.random() * 10).toString();
+            }
+            return result;
+        }
+
+        // 生成用户名
+        function generateUsername(prefix, baseLength, index = 0) {
+            const config = getUsernameConfig();
+            const generationMode = config.generationMode;
+            
+            let username = '';
+            
+            switch (generationMode) {
+                case 'letters_numbers':
+                    // 字母+数字模式：基础长度是字母部分，数字部分额外添加
+                    const letters = generateRandomLetters(baseLength, 
+                        config.includeUppercase, config.includeLowercase);
+                    let numbers = '';
+                    
+                    if (config.numberMode === 'pattern') {
+                        numbers = generatePatternNumber(config.patternType, index);
+                    } else {
+                        numbers = generateRandomNumbers(config.numberLength);
+                    }
+                    
+                    username = letters + numbers;
+                    break;
+                    
+                case 'numbers_letters':
+                    // 数字+字母模式：数字部分 + 基础长度的字母部分
+                    let numbers2 = '';
+                    if (config.numberMode === 'pattern') {
+                        numbers2 = generatePatternNumber(config.patternType, index);
+                    } else {
+                        numbers2 = generateRandomNumbers(config.numberLength);
+                    }
+                    const letters2 = generateRandomLetters(baseLength, 
+                        config.includeUppercase, config.includeLowercase);
+                    
+                    username = numbers2 + letters2;
+                    break;
+                    
+                case 'random':
+                default:
+                    // 完全随机模式：基础长度即为总长度
+                    username = generateRandomUsername(config, baseLength);
+                    break;
+            }
+            
+            // 如果有前缀，添加前缀
+            if (prefix) {
+                username = prefix + username;
+            }
+            
+            return username;
+        }
+
+        // 完全随机用户名生成
+        function generateRandomUsername(config, length) {
+            let charset = '';
+            if (config.includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (config.includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (config.includeNumbers) charset += '0123456789';
+            if (config.includeSymbols) charset += '!@#$%^&*()_+{}[]|:;<>,.?/~`-=';
+            
+            if (charset === '') {
+                charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            }
+            
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                result += charset[randomIndex];
+            }
+            
+            return result;
+        }
+
+        // 生成密码
+        function generatePassword() {
+            const length = parseInt(document.getElementById('passwordLength').value);
+            let charset = '';
+            
+            if (document.getElementById('includeUppercase').checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (document.getElementById('includeLowercase').checked) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (document.getElementById('includeNumbers').checked) charset += '0123456789';
+            if (document.getElementById('includeSymbols').checked) charset += '!@#$%^&*()_+{}[]|:;<>,.?/~`-=';
+            
+            if (charset === '') {
+                charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            }
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+            
+            return password;
+        }
+
         // 开始注册
         async function startRegistration() {
             if (isRegistering) {
@@ -1536,7 +2020,7 @@
                 }
                 
                 if (isNaN(usernameLength) || usernameLength < 1 || usernameLength > 20) {
-                    showError('用户名长度必须在1-20之间');
+                    showError('基础长度必须在1-20之间');
                     return;
                 }
                 
@@ -1547,6 +2031,7 @@
                     return;
                 }
                 
+                // 设置状态为正在注册
                 isRegistering = true;
                 updateButtonStates();
                 showLoading('正在批量注册邮箱账号...');
@@ -1555,79 +2040,92 @@
                 const successfulAccounts = [];
                 const failedAccounts = [];
                 
-                for (let i = 0; i < registerCount; i++) {
-                    const progress = ((i + 1) / registerCount) * 100;
-                    updateLoadingProgress(progress);
-                    updateProgress(i + 1, registerCount);
-                    
-                    const username = generateUsername(usernamePrefix, usernameLength);
-                    const email = `${username}@${emailDomain}`;
-                    const password = generatePassword();
-                    
-                    try {
-                        // 模拟API调用延迟
-                        await new Promise(resolve => setTimeout(resolve, 800));
+                try {
+                    for (let i = 0; i < registerCount; i++) {
+                        const progress = ((i + 1) / registerCount) * 100;
+                        updateLoadingProgress(progress);
+                        updateProgress(i + 1, registerCount);
                         
-                        const success = await registerAccount(apiDomain, accessToken, email, password, roleName);
+                        const username = generateUsername(usernamePrefix, usernameLength, i);
+                        const email = `${username}@${emailDomain}`;
+                        const password = generatePassword();
                         
-                        if (success) {
+                        try {
+                            // 模拟API调用延迟
+                            await new Promise(resolve => setTimeout(resolve, 800));
+                            
+                            const success = await registerAccount(apiDomain, accessToken, email, password, roleName);
+                            
+                            if (success) {
+                                const account = {
+                                    id: Date.now() + i,
+                                    email: email,
+                                    password: password,
+                                    status: 'success',
+                                    timestamp: new Date().toLocaleString()
+                                };
+                                successfulAccounts.push(account);
+                                registeredAccounts.unshift(account);
+                                addRecentResult(account, 'success');
+                                log('成功', `邮箱 ${email} 注册成功`);
+                            } else {
+                                throw new Error('注册失败');
+                            }
+                            
+                        } catch (error) {
                             const account = {
                                 id: Date.now() + i,
                                 email: email,
                                 password: password,
-                                status: 'success',
+                                status: 'failed',
+                                error: error.message,
                                 timestamp: new Date().toLocaleString()
                             };
-                            successfulAccounts.push(account);
+                            failedAccounts.push(account);
                             registeredAccounts.unshift(account);
-                            addRecentResult(account, 'success');
-                            log('成功', `邮箱 ${email} 注册成功`);
-                        } else {
-                            throw new Error('注册失败');
+                            addRecentResult(account, 'failed');
+                            log('失败', `邮箱 ${email} 注册失败: ${error.message}`);
                         }
                         
-                    } catch (error) {
-                        const account = {
-                            id: Date.now() + i,
-                            email: email,
-                            password: password,
-                            status: 'failed',
-                            error: error.message,
-                            timestamp: new Date().toLocaleString()
-                        };
-                        failedAccounts.push(account);
-                        registeredAccounts.unshift(account);
-                        addRecentResult(account, 'failed');
-                        log('失败', `邮箱 ${email} 注册失败: ${error.message}`);
+                        // 更新状态消息
+                        updateStatusMessage(`正在注册第 ${i + 1}/${registerCount} 个账号`);
                     }
                     
-                    // 更新状态消息
-                    updateStatusMessage(`正在注册第 ${i + 1}/${registerCount} 个账号`);
+                    const endTime = Date.now();
+                    const totalTime = (endTime - startTime) / 1000;
+                    
+                    // 保存数据并更新界面
+                    saveData();
+                    updateDashboard();
+                    updateResultsTable();
+                    
+                    // 显示成功消息
+                    hideModal('loadingModal');
+                    showSuccess(
+                        `批量注册完成！\n成功: ${successfulAccounts.length} 个\n失败: ${failedAccounts.length} 个\n总耗时: ${totalTime.toFixed(1)} 秒`,
+                        successfulAccounts.length > 0
+                    );
+                    
+                    log('系统', `批量注册完成，成功 ${successfulAccounts.length} 个，失败 ${failedAccounts.length} 个`);
+                    
+                } finally {
+                    // 确保无论成功还是失败都重置状态
+                    isRegistering = false;
+                    updateButtonStates();
+                    updateProgress(0, 0);
+                    updateStatusMessage('准备就绪，可以开始新的注册任务');
                 }
-                
-                const endTime = Date.now();
-                const totalTime = (endTime - startTime) / 1000;
-                
-                saveData();
-                updateDashboard();
-                updateResultsTable();
-                updateButtonStates();
-                
-                hideModal('loadingModal');
-                showSuccess(
-                    `批量注册完成！\n成功: ${successfulAccounts.length} 个\n失败: ${failedAccounts.length} 个\n总耗时: ${totalTime.toFixed(1)} 秒`,
-                    successfulAccounts.length > 0
-                );
-                
-                log('系统', `批量注册完成，成功 ${successfulAccounts.length} 个，失败 ${failedAccounts.length} 个`);
                 
             } catch (error) {
                 console.error('注册过程失败:', error);
+                // 确保在错误情况下也重置状态
                 isRegistering = false;
                 updateButtonStates();
                 hideModal('loadingModal');
                 showError(`注册过程中发生错误: ${error.message}`);
                 log('错误', `批量注册失败: ${error.message}`);
+                updateProgress(0, 0);
+                updateStatusMessage('准备就绪，可以开始新的注册任务');
             }
         }
 
@@ -1666,77 +2164,6 @@
                 console.error('账号注册失败:', error);
                 throw error;
             }
-        }
-
-        // 获取用户名配置
-        function getUsernameConfig() {
-            const includeUppercase = document.getElementById('includeUsernameUppercase').checked;
-            const includeLowercase = document.getElementById('includeUsernameLowercase').checked;
-            const includeNumbers = document.getElementById('includeUsernameNumbers').checked;
-            const includeSymbols = document.getElementById('includeUsernameSymbols').checked;
-            
-            // 验证至少选择一种字符类型
-            if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSymbols) {
-                return {
-                    valid: false,
-                    error: '请至少选择一种用户名字符类型'
-                };
-            }
-            
-            return {
-                valid: true,
-                includeUppercase: includeUppercase,
-                includeLowercase: includeLowercase,
-                includeNumbers: includeNumbers,
-                includeSymbols: includeSymbols
-            };
-        }
-
-        // 生成用户名 - 只使用完全随机模式
-        function generateUsername(prefix, length) {
-            const config = getUsernameConfig();
-            
-            let charset = '';
-            if (config.includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            if (config.includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-            if (config.includeNumbers) charset += '0123456789';
-            if (config.includeSymbols) charset += '!@#$%^&*()_+{}[]|:;<>,.?/~`-=';
-            
-            let randomPart = '';
-            for (let i = 0; i < length; i++) {
-                const randomIndex = Math.floor(Math.random() * charset.length);
-                randomPart += charset[randomIndex];
-            }
-            
-            // 如果有前缀，添加前缀
-            if (prefix) {
-                return prefix + randomPart;
-            }
-            
-            return randomPart;
-        }
-
-        // 生成密码
-        function generatePassword() {
-            const length = parseInt(document.getElementById('passwordLength').value);
-            let charset = '';
-            
-            if (document.getElementById('includeUppercase').checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            if (document.getElementById('includeLowercase').checked) charset += 'abcdefghijklmnopqrstuvwxyz';
-            if (document.getElementById('includeNumbers').checked) charset += '0123456789';
-            if (document.getElementById('includeSymbols').checked) charset += '!@#$%^&*()_+{}[]|:;<>,.?/~`-=';
-            
-            if (charset === '') {
-                charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            }
-            
-            let password = '';
-            for (let i = 0; i < length; i++) {
-                const randomIndex = Math.floor(Math.random() * charset.length);
-                password += charset[randomIndex];
-            }
-            
-            return password;
         }
 
         // 更新进度
@@ -1834,6 +2261,7 @@
         function updateResultsTable() {
             const filteredAccounts = getFilteredAccounts();
             const resultsTable = document.getElementById('resultsTable');
+            const deleteAllBtn = document.getElementById('deleteAllBtn');
             
             if (filteredAccounts.length === 0) {
                 resultsTable.innerHTML = `
@@ -1844,6 +2272,7 @@
                         </td>
                     </tr>
                 `;
+                deleteAllBtn.disabled = true;
                 return;
             }
             
@@ -1884,6 +2313,8 @@
                 
                 resultsTable.appendChild(row);
             });
+            
+            deleteAllBtn.disabled = registeredAccounts.length === 0;
         }
 
         // 过滤结果
@@ -1963,6 +2394,11 @@
             document.getElementById('registerCount').value = 5;
             document.getElementById('usernamePrefix').value = '';
             document.getElementById('usernameLength').value = '6';
+            document.getElementById('generationMode').value = 'random';
+            document.getElementById('numberMode').value = 'random';
+            document.getElementById('numberLength').value = '3';
+            document.getElementById('patternType').value = 'student_id';
+            document.getElementById('startValue').value = '1001';
             document.getElementById('roleName').value = '';
             
             // 重置用户名字符类型选择
@@ -1978,6 +2414,7 @@
             document.getElementById('includeSymbols').checked = false;
             document.getElementById('passwordLength').value = 10;
             
+            updatePatternOptions();
             updateProgress(0, 0);
             updateStatusMessage('请先配置API并生成Token');
             
@@ -1999,16 +2436,46 @@
             }
         }
 
+        // 确认删除全部记录
+        function confirmDeleteAll() {
+            if (registeredAccounts.length === 0) {
+                showToast('没有记录可删除');
+                return;
+            }
+            
+            showModal('confirmDeleteModal');
+        }
+
+        // 删除全部记录
+        function deleteAllRecords() {
+            registeredAccounts = [];
+            document.getElementById('recentResults').innerHTML = `
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fa fa-inbox text-4xl mb-2 opacity-50"></i>
+                    <p class="text-sm">暂无注册记录</p>
+                </div>
+            `;
+            updateDashboard();
+            updateResultsTable();
+            updateButtonStates();
+            saveData();
+            hideModal('confirmDeleteModal');
+            log('系统', '已删除所有注册记录');
+            showToast('所有记录已删除');
+        }
+
         // 更新按钮状态
         function updateButtonStates() {
             const hasResults = registeredAccounts.length > 0;
             const exportBtn = document.getElementById('exportBtn');
             const clearBtn = document.getElementById('clearBtn');
             const startRegisterBtn = document.getElementById('startRegisterBtn');
+            const deleteAllBtn = document.getElementById('deleteAllBtn');
             
             if (exportBtn) exportBtn.disabled = !hasResults;
             if (clearBtn) clearBtn.disabled = !hasResults;
             if (startRegisterBtn) startRegisterBtn.disabled = isRegistering;
+            if (deleteAllBtn) deleteAllBtn.disabled = !hasResults;
         }
 
         // 复制文本
@@ -2058,7 +2525,7 @@
 
         // 隐藏所有模态框
         function hideAllModals() {
-            const modals = ['loadingModal', 'successModal', 'errorModal', 'tokenHistoryModal', 'helpModal'];
+            const modals = ['loadingModal', 'successModal', 'errorModal', 'tokenHistoryModal', 'confirmDeleteModal', 'helpModal'];
             modals.forEach(modalId => hideModal(modalId));
         }
 
