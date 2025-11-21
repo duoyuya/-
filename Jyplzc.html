@@ -1,0 +1,2936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>邮箱批量注册 - 极简面板</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f4f5fb;
+      --card-bg: #ffffff;
+      --border: #e2e4f0;
+      --border-soft: #edf0fb;
+      --primary: #2563eb;
+      --primary-soft: rgba(37, 99, 235, 0.08);
+      --danger: #ef4444;
+      --success: #16a34a;
+      --text: #111827;
+      --muted: #6b7280;
+      --radius: 12px;
+      --shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.06);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #eef1ff 0, #f4f5fb 40%, #f6f7fc 100%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      gap: 12px;
+    }
+
+    .title-group h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+
+    .title-group small {
+      display: block;
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .version-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.06);
+      color: #1d4ed8;
+      font-size: 11px;
+      margin-left: 6px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .stat-item {
+      min-width: 90px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(226, 232, 240, 0.7);
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-item span.value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+
+    .badge-gray {
+      background: #f3f4f6;
+      color: #4b5563;
+      border-color: #e5e7eb;
+    }
+
+    .badge-green {
+      background: rgba(22, 163, 74, 0.08);
+      color: #15803d;
+      border-color: rgba(22, 163, 74, 0.35);
+    }
+
+    .badge-red {
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.8fr);
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .stats {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .app {
+        margin: 16px auto 24px;
+        padding: 0 10px;
+      }
+      .title-group h1 {
+        font-size: 20px;
+      }
+      .card {
+        padding: 12px 12px 10px;
+      }
+      .stats {
+        width: 100%;
+      }
+      .stat-item {
+        flex: 1 1 calc(50% - 5px);
+      }
+      table {
+        font-size: 11px;
+      }
+      th,
+      td {
+        padding: 4px 4px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-header {
+        align-items: stretch;
+      }
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .stat-item {
+        flex: 1 1 100%;
+      }
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 14px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 6px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .card-header-right {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 12px;
+    }
+
+    @media (max-width: 720px) {
+      .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .form-row label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+    }
+
+    .form-row label span.req {
+      color: #ef4444;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 7px 9px;
+      font-size: 13px;
+      outline: none;
+      background: #f9fafb;
+      transition: border-color var(--transition-fast), background var(--transition-fast),
+        box-shadow var(--transition-fast);
+      width: 100%;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(37, 99, 235, 0.7);
+      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.08);
+    }
+
+    input[readonly] {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .input-inline {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-inline input {
+      flex: 1;
+    }
+
+    /* 规律模式：下拉框窄一点，数字输入框更宽，方便手机输入查看 */
+    #rowPatternConfig .input-inline select {
+      flex: 0 0 110px;
+      max-width: 120px;
+    }
+    #rowPatternConfig .input-inline input {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .btn,
+    button {
+      font-family: inherit;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, background 0.15s ease-out,
+        border-color 0.15s ease-out, color 0.15s ease-out;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 30px rgba(37, 99, 235, 0.4);
+      background: #1d4ed8;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding-inline: 10px;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(148, 163, 184, 0.1);
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+      border-radius: 999px;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    .icon-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 7px;
+      font-size: 12px;
+      background: transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: background var(--transition-fast), color var(--transition-fast),
+        transform 0.1s ease-out;
+    }
+
+    .icon-btn:hover {
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text);
+      transform: translateY(-0.5px);
+    }
+
+    /* 表格中小眼睛、小复制按钮 */
+    .icon-btn-mini {
+      padding: 1px 4px;
+      font-size: 11px;
+      margin-left: 2px;
+    }
+
+    .token-display {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .token-input {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+    }
+
+    .pill-group {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: rgba(148, 163, 184, 0.1);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .pill-strong {
+      background: rgba(37, 99, 235, 0.08);
+      color: #1d4ed8;
+    }
+
+    .section-title-inline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      cursor: pointer;
+      color: #4b5563;
+      transition: background var(--transition-fast), border-color var(--transition-fast),
+        color var(--transition-fast);
+    }
+
+    .chip input {
+      margin: 0;
+    }
+
+    .chip.active {
+      border-color: rgba(37, 99, 235, 0.7);
+      background: rgba(37, 99, 235, 0.06);
+      color: #1d4ed8;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .muted-sm {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .progress-wrap {
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .progress-bar-inner {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+      transition: width 0.2s ease-out;
+    }
+
+    .progress-text {
+      margin-top: 4px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead {
+      background: #f9fafb;
+    }
+
+    th,
+    td {
+      padding: 6px 6px;
+      text-align: left;
+      border-bottom: 1px solid #f2f4f7;
+    }
+
+    th {
+      font-weight: 500;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+
+    tr:hover td {
+      background: #f9fafb;
+    }
+
+    .table-wrapper {
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @media (max-width: 600px) {
+      .table-wrapper table {
+        min-width: 600px;
+      }
+    }
+
+    .status-tag {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-ok {
+      background: rgba(22, 163, 74, 0.08);
+      color: #15803d;
+      border-color: rgba(22, 163, 74, 0.35);
+    }
+
+    .status-fail {
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .status-pending {
+      background: rgba(148, 163, 184, 0.1);
+      color: #4b5563;
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    .log-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 220px;
+      overflow: auto;
+      font-size: 12px;
+    }
+
+    .log-item {
+      padding: 4px 0;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .log-item span.time {
+      color: #9ca3af;
+      margin-right: 6px;
+    }
+
+    .log-item span.tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 999px;
+      margin-right: 6px;
+    }
+
+    .tag-system {
+      background: #e5e7eb;
+      color: #4b5563;
+    }
+
+    .tag-success {
+      background: rgba(22, 163, 74, 0.18);
+      color: #166534;
+    }
+
+    .tag-error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #b91c1c;
+    }
+
+    .help-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .help-list li {
+      padding: 2px 0;
+    }
+
+    .pill-filter-group {
+      display: inline-flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .pill-filter {
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #6b7280;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast),
+        color var(--transition-fast);
+    }
+
+    .pill-filter.active {
+      border-color: rgba(37, 99, 235, 0.7);
+      background: rgba(37, 99, 235, 0.06);
+      color: #1d4ed8;
+    }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #111827;
+      color: white;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+      z-index: 999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .toast-success {
+      background: #16a34a;
+    }
+
+    .toast-error {
+      background: #dc2626;
+    }
+
+    .toast-info {
+      background: #111827;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out;
+      z-index: 995;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .dialog {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease-out, transform 0.15s ease-out;
+      z-index: 996;
+    }
+
+    .dialog.show {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .dialog-content {
+      width: min(420px, 92vw);
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 18px 60px rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      padding: 16px 16px 14px;
+      transform: translateY(8px);
+    }
+
+    .dialog.show .dialog-content {
+      transform: translateY(0);
+    }
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .dialog-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .dialog-body {
+      max-height: 320px;
+      overflow: auto;
+      font-size: 13px;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .token-history-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .token-history-item {
+      padding: 6px 0;
+      border-bottom: 1px dashed #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .token-history-meta {
+      color: #6b7280;
+      font-size: 11px;
+    }
+
+    .token-history-token {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+      font-size: 11px;
+      color: #4b5563;
+      word-break: break-all;
+    }
+
+    .badge-outline {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      color: #6b7280;
+    }
+
+    .email-detail {
+      font-size: 12px;
+    }
+
+    .email-detail-row {
+      margin-bottom: 4px;
+    }
+
+    .email-detail-row span.label {
+      display: inline-block;
+      width: 54px;
+      color: #6b7280;
+    }
+
+    .email-body-viewer {
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      margin-top: 8px;
+      height: 180px;
+      overflow: hidden;
+    }
+
+    .email-body-viewer iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .badge-type {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.08);
+      color: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="title-group">
+        <h1>邮箱批量注册</h1>
+        <small
+          >基于 Cloud Mail 开放 API · 自用极简控制台<span class="version-tag">UI v1.0</span></small
+        >
+      </div>
+      <div class="stats">
+        <div class="stat-item">
+          <span>今日注册</span>
+          <span class="value" id="statToday">0</span>
+        </div>
+        <div class="stat-item">
+          <span>总注册数</span>
+          <span class="value" id="statTotal">0</span>
+        </div>
+        <div class="stat-item">
+          <span>成功率</span>
+          <span class="value" id="statRate">0%</span>
+        </div>
+        <div class="stat-item">
+          <span>API 状态</span>
+          <span class="value">
+            <span id="apiStatus" class="badge badge-gray">待检测</span>
+            <button
+              type="button"
+              class="icon-btn"
+              id="btnCheckApi"
+              title="检测 API 联通性"
+            >
+              ⟳
+            </button>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- 左侧：API + 注册配置 + 进度 -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">API 配置</div>
+            <div class="card-subtitle">只需配置一次，令牌与基础信息会保存在本地浏览器</div>
+          </div>
+          <div class="card-header-right muted-sm">
+            <span>Token 单例 · 后台统一认证</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>API 域名<span class="req">*</span></label>
+            <input
+              type="text"
+              id="inputApiBase"
+              placeholder="例如：https://mail.example.com"
+            />
+          </div>
+          <div class="form-row">
+            <label>Access Token</label>
+            <div class="token-display">
+              <input
+                type="password"
+                id="inputToken"
+                class="token-input"
+                placeholder="尚未生成或粘贴"
+              />
+              <button
+                type="button"
+                class="icon-btn"
+                id="btnToggleToken"
+                title="显示/隐藏"
+              >
+                👁
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                id="btnClearToken"
+                title="清除"
+              >
+                ✕
+              </button>
+            </div>
+            <div class="muted-sm">
+              可直接粘贴已有 Token，或通过下方管理员账号生成
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>管理员邮箱<span class="req">*</span></label>
+            <input
+              type="text"
+              id="inputAdminEmail"
+              placeholder="用于生成 Token 的管理员邮箱"
+            />
+          </div>
+          <div class="form-row">
+            <label>管理员密码<span class="req">*</span></label>
+            <input
+              type="password"
+              id="inputAdminPassword"
+              placeholder="不会上传保存，仅用来向 API 请求 Token"
+            />
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 10px;
+          "
+        >
+          <div style="display: flex; gap: 6px">
+            <button class="btn btn-ghost btn-sm" id="btnTokenHistory">
+              Token 历史
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnGenToken">
+              生成 Token
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">注册设置</div>
+            <div class="card-subtitle">
+              根据规则自动生成用户名 + 密码，单次最多 100 个账号
+            </div>
+          </div>
+          <div class="card-header-right">
+            <span class="pill pill-strong">批量创建</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>注册数量<span class="req">*</span></label>
+            <input
+              type="number"
+              id="inputCount"
+              min="1"
+              max="100"
+              value="10"
+            />
+            <div class="muted-sm">推荐单次 &lt;= 100，避免接口压力</div>
+          </div>
+          <div class="form-row">
+            <label>邮箱域名<span class="req">*</span></label>
+            <input
+              type="text"
+              id="inputDomain"
+              placeholder="例如：example.com 或 @example.com"
+            />
+            <div class="muted-sm">无需填写用户名部分，仅填写域名即可</div>
+          </div>
+        </div>
+
+        <div class="section-title-inline">
+          <span>用户名配置</span>
+          <span class="muted-sm" id="usernamePreview">总长度预览：0 位</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>用户名前缀</label>
+            <input
+              type="text"
+              id="inputUsernamePrefix"
+              placeholder="可选，留空则完全随机"
+            />
+          </div>
+          <div class="form-row">
+            <label>基础长度<span class="req">*</span></label>
+            <input
+              type="number"
+              id="inputBaseLength"
+              min="1"
+              max="20"
+              value="6"
+            />
+          </div>
+          <div class="form-row">
+            <label>生成模式<span class="req">*</span></label>
+            <div class="chip-group" id="usernameModeGroup">
+              <label class="chip active"
+                ><input
+                  type="radio"
+                  name="usernameMode"
+                  value="random"
+                  checked
+                />完全随机</label
+              >
+              <label class="chip"
+                ><input type="radio" name="usernameMode" value="letter-digit" />字母+数字</label
+              >
+              <label class="chip"
+                ><input type="radio" name="usernameMode" value="digit-letter" />数字+字母</label
+              >
+            </div>
+          </div>
+          <div class="form-row">
+            <label>数字部分</label>
+            <div class="chip-group" id="numberModeGroup">
+              <label class="chip active"
+                ><input
+                  type="radio"
+                  name="numberMode"
+                  value="none"
+                  checked
+                />无数字</label
+              >
+              <label class="chip"
+                ><input type="radio" name="numberMode" value="random" />随机数字</label
+              >
+              <label class="chip"
+                ><input type="radio" name="numberMode" value="pattern" />规律模式</label
+              >
+            </div>
+          </div>
+          <div class="form-row" id="rowNumberLength">
+            <label>数字长度</label>
+            <input
+              type="number"
+              id="inputNumberLength"
+              min="1"
+              max="10"
+              value="3"
+            />
+          </div>
+          <div class="form-row" id="rowPatternConfig" style="display: none">
+            <label>规律模式设置</label>
+            <div class="input-inline">
+              <select id="selectPatternType">
+                <option value="student">学号模式</option>
+                <option value="date">日期模式</option>
+                <option value="increment">递增模式</option>
+              </select>
+              <input
+                type="number"
+                id="inputPatternStart"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="起始值（日期模式可留空）"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <label>字符类型（用户名）</label>
+            <div class="chip-group" id="usernameCharsetGroup">
+              <label class="chip active"
+                ><input type="checkbox" value="upper" checked />大写</label
+              >
+              <label class="chip active"
+                ><input type="checkbox" value="lower" checked />小写</label
+              >
+              <label class="chip active"
+                ><input type="checkbox" value="digit" checked />数字</label
+              >
+              <label class="chip"
+                ><input type="checkbox" value="symbol" />符号</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title-inline" style="margin-top: 8px">
+          <span>密码配置</span>
+          <span class="muted-sm">密码只在本页面展示 & 导出，不会回传到服务器</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>密码长度</label>
+            <div class="chip-group" id="passwordLengthGroup">
+              <label class="chip"
+                ><input type="radio" name="passwordLength" value="8" />8</label
+              >
+              <label class="chip active"
+                ><input
+                  type="radio"
+                  name="passwordLength"
+                  value="10"
+                  checked
+                />10</label
+              >
+              <label class="chip"
+                ><input type="radio" name="passwordLength" value="12" />12</label
+              >
+              <label class="chip"
+                ><input type="radio" name="passwordLength" value="16" />16</label
+              >
+            </div>
+          </div>
+          <div class="form-row">
+            <label>密码字符类型</label>
+            <div class="chip-group" id="passwordCharsetGroup">
+              <label class="chip active"
+                ><input type="checkbox" value="upper" checked />大写</label
+              >
+              <label class="chip active"
+                ><input type="checkbox" value="lower" checked />小写</label
+              >
+              <label class="chip active"
+                ><input type="checkbox" value="digit" checked />数字</label
+              >
+              <label class="chip"
+                ><input type="checkbox" value="symbol" />符号</label
+              >
+            </div>
+          </div>
+          <div class="form-row">
+            <label>权限角色</label>
+            <input
+              type="text"
+              id="inputRoleName"
+              placeholder="可选，不填则使用默认权限身份"
+            />
+          </div>
+          <div class="form-row" style="align-self: flex-end">
+            <div style="display: flex; justify-content: flex-end; gap: 8px">
+              <button class="btn btn-ghost btn-sm" id="btnResetSettings">
+                重置设置
+              </button>
+              <button class="btn btn-primary btn-sm" id="btnStartRegister">
+                开始注册
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="section-title-inline">
+            <span>注册进度</span>
+            <span class="muted-sm" id="progressText">0 / 0 · 0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar-inner" id="progressBar"></div>
+          </div>
+          <div class="progress-text">
+            <span id="progressStatus">等待开始</span>
+            <span class="muted-sm">单个账号逐一调用接口</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右侧：结果 / 邮件查询 / 日志 -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">注册结果</div>
+            <div class="card-subtitle">保存所有本地注册记录，可导出为 CSV</div>
+          </div>
+          <div class="card-header-right">
+            <div class="pill-filter-group" id="resultFilterGroup">
+              <button class="pill-filter active" data-filter="all">全部</button>
+              <button class="pill-filter" data-filter="success">成功</button>
+              <button class="pill-filter" data-filter="fail">失败</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px">
+          <div class="muted-sm">
+            单次导出包含：邮箱、密码、状态、时间、备注（错误信息）
+          </div>
+          <div style="display: flex; gap: 6px">
+            <button class="btn btn-ghost btn-sm" id="btnExportRecords">
+              导出 CSV
+            </button>
+            <button class="btn btn-danger btn-sm" id="btnClearRecords">
+              清空记录
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 40px">#</th>
+                <th>邮箱地址</th>
+                <th>密码</th>
+                <th style="width: 80px">状态</th>
+                <th style="width: 130px">时间</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody id="recordTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 18px 8px">
+                  <span class="muted">暂无注册记录</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">邮件查询</div>
+            <div class="card-subtitle">按收件人 / 发件人 / 主题筛选，查看收发邮件概览</div>
+          </div>
+          <div class="card-header-right muted-sm">
+            需要有效 Token 与 API 域名
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>收件人邮箱</label>
+            <input
+              type="text"
+              id="inputToEmail"
+              placeholder="支持模糊：如 admin% 或 %@example.com"
+            />
+          </div>
+          <div class="form-row">
+            <label>发件人邮箱</label>
+            <input
+              type="text"
+              id="inputSendEmail"
+              placeholder="支持模糊"
+            />
+          </div>
+          <div class="form-row">
+            <label>主题关键字</label>
+            <input
+              type="text"
+              id="inputSubject"
+              placeholder="支持模糊匹配"
+            />
+          </div>
+          <div class="form-row">
+            <label>邮件类型</label>
+            <select id="selectEmailType">
+              <option value="">全部</option>
+              <option value="0">收件</option>
+              <option value="1">发件</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>是否删除</label>
+            <select id="selectIsDel">
+              <option value="">全部</option>
+              <option value="0">正常</option>
+              <option value="2">已删除</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>排序 / 分页</label>
+            <div class="input-inline">
+              <select id="selectTimeSort">
+                <option value="desc">最新在前</option>
+                <option value="asc">最旧在前</option>
+              </select>
+              <input
+                type="number"
+                id="inputPageNum"
+                min="1"
+                value="1"
+                style="max-width: 70px"
+              />
+              <input
+                type="number"
+                id="inputPageSize"
+                min="1"
+                max="100"
+                value="20"
+                style="max-width: 70px"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+          "
+        >
+          <div class="muted-sm">
+            提示：支持使用 % 进行模糊匹配（如 <code>admin%</code> / <code>%@example.com</code>）
+          </div>
+          <button class="btn btn-primary btn-sm" id="btnQueryEmail">
+            查询邮件
+          </button>
+        </div>
+
+        <div
+          class="table-wrapper"
+          style="margin-top: 4px"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 40px">#</th>
+                <th style="width: 72px">类型</th>
+                <th>发件人</th>
+                <th>收件人</th>
+                <th>主题</th>
+                <th style="width: 130px">时间</th>
+                <th style="width: 64px">操作</th>
+              </tr>
+            </thead>
+            <tbody id="emailTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 16px 8px">
+                  <span class="muted">尚未查询，填写条件后点击「查询邮件」</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">系统日志</div>
+            <div class="card-subtitle">仅保存在当前浏览器，方便排查问题</div>
+          </div>
+          <div class="card-header-right">
+            <span class="badge-outline" id="logCountBadge">0 条</span>
+          </div>
+        </div>
+        <ul class="log-list" id="logList"></ul>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+          "
+        >
+          <div class="muted-sm">
+            若 Token 失效 / API 报错，可优先查看这里的时间与错误提示
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btnClearLog">
+            清空日志
+          </button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 10px 0" />
+
+        <div class="card-subtitle" style="margin-bottom: 6px">快速使用提示</div>
+        <ul class="help-list">
+          <li>1. 先在左上配置 API 域名、管理员账号，点击「生成 Token」。</li>
+          <li>2. 设置注册数量、域名与用户名规则，确认密码长度。</li>
+          <li>3. 点击「开始注册」，等待右上进度条跑完即可。</li>
+          <li>4. 结果支持过滤成功 / 失败并导出 CSV。</li>
+          <li>
+            5.
+            实际生产环境建议自行替换本地存储策略，避免在公共设备长时间保存敏感信息。
+          </li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Token 历史弹窗 -->
+  <div class="dialog" id="dialogTokenHistory">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div class="dialog-title">Token 历史</div>
+        <button class="icon-btn" data-dialog-close="dialogTokenHistory">
+          ✕
+        </button>
+      </div>
+      <div class="dialog-body">
+        <p class="muted-sm" style="margin-top: 0">
+          仅存储在当前浏览器本地，建议不要在公共设备长期保留。
+        </p>
+        <ul class="token-history-list" id="tokenHistoryList"></ul>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-ghost btn-sm" data-dialog-close="dialogTokenHistory">
+          关闭
+        </button>
+        <button class="btn btn-danger btn-sm" id="btnClearTokenHistory">
+          清空历史
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 清空记录确认 -->
+  <div class="dialog" id="dialogConfirmClear">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div class="dialog-title">确认清空注册记录？</div>
+      </div>
+      <div class="dialog-body">
+        <p class="muted-sm">
+          此操作仅清理本地记录，不会影响已创建的邮箱账号。操作不可撤销，请谨慎确认。
+        </p>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-ghost btn-sm" data-dialog-close="dialogConfirmClear">
+          取消
+        </button>
+        <button class="btn btn-danger btn-sm" id="btnConfirmClearRecords">
+          确认清空
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 邮件详情弹窗 -->
+  <div class="dialog" id="dialogEmailDetail">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div class="dialog-title">邮件详情</div>
+        <button class="icon-btn" data-dialog-close="dialogEmailDetail">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div class="email-detail" id="emailDetailContent"></div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-ghost btn-sm" data-dialog-close="dialogEmailDetail">
+          关闭
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "skyBatchReg_v1";
+      const TODAY_KEY = "skyBatchReg_today";
+
+      const $ = (sel) => document.querySelector(sel);
+      const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+      const state = {
+        apiBase: "",
+        token: "",
+        adminEmail: "",
+        stats: {
+          today: 0,
+          total: 0,
+          success: 0,
+          fail: 0,
+        },
+        tokenHistory: [],
+        records: [],
+      };
+
+      let currentFilter = "all";
+      let toastTimer = null;
+      let running = false;
+      let emailCache = [];
+
+      const htmlEsc = (str) =>
+        (str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+
+      function todayStr() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${dd}`;
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const saved = JSON.parse(raw);
+            if (saved.apiBase) state.apiBase = saved.apiBase;
+            if (saved.token) state.token = saved.token;
+            if (saved.adminEmail) state.adminEmail = saved.adminEmail;
+            if (saved.stats) Object.assign(state.stats, saved.stats);
+            if (Array.isArray(saved.tokenHistory))
+              state.tokenHistory = saved.tokenHistory;
+            if (Array.isArray(saved.records)) state.records = saved.records;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        const t = todayStr();
+        const last = localStorage.getItem(TODAY_KEY);
+        if (last !== t) {
+          state.stats.today = 0;
+          localStorage.setItem(TODAY_KEY, t);
+        }
+
+        $("#inputApiBase").value = state.apiBase || "";
+        $("#inputToken").value = state.token || "";
+        $("#inputAdminEmail").value = state.adminEmail || "";
+        updateStats();
+        renderRecords();
+        addLog("系统已启动，准备就绪", "system");
+        refreshTokenHistoryUI();
+        updateApiStatus();
+        syncNumberModeUI();
+        updateUsernamePreview();
+      }
+
+      function saveState() {
+        const toSave = {
+          apiBase: state.apiBase,
+          token: state.token,
+          adminEmail: state.adminEmail,
+          stats: state.stats,
+          tokenHistory: state.tokenHistory,
+          records: state.records,
+        };
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      function showToast(type, msg) {
+        const toast = $("#toast");
+        toast.className = "toast";
+        if (type === "success") toast.classList.add("toast-success");
+        else if (type === "error") toast.classList.add("toast-error");
+        else toast.classList.add("toast-info");
+        toast.textContent = msg;
+        toast.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2600);
+      }
+
+      function addLog(message, level = "system") {
+        const logList = $("#logList");
+        const li = document.createElement("li");
+        li.className = "log-item";
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("zh-CN", {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        const tagMap = {
+          system: "系统",
+          success: "成功",
+          error: "错误",
+        };
+        const tagClassMap = {
+          system: "tag-system",
+          success: "tag-success",
+          error: "tag-error",
+        };
+        li.innerHTML = `
+          <span class="time">${timeStr}</span>
+          <span class="tag ${tagClassMap[level] || "tag-system"}">${
+          tagMap[level] || "系统"
+        }</span>
+          <span>${message}</span>
+        `;
+        logList.prepend(li);
+        const count = logList.children.length;
+        $("#logCountBadge").textContent = `${count} 条`;
+      }
+
+      function updateStats() {
+        const { today, total, success, fail } = state.stats;
+        $("#statToday").textContent = today;
+        $("#statTotal").textContent = total;
+        const sum = success + fail;
+        const rate = sum === 0 ? 0 : Math.round((success / sum) * 100);
+        $("#statRate").textContent = `${rate}%`;
+      }
+
+      function updateApiStatus(ok) {
+        const el = $("#apiStatus");
+        el.className = "badge";
+        if (!state.apiBase && !$("#inputApiBase").value.trim()) {
+          el.classList.add("badge-gray");
+          el.textContent = "未配置";
+          return;
+        }
+        if (!state.token && !$("#inputToken").value.trim()) {
+          el.classList.add("badge-gray");
+          el.textContent = "未配置 Token";
+          return;
+        }
+        if (ok === true) {
+          el.classList.add("badge-green");
+          el.textContent = "已连接";
+        } else if (ok === false) {
+          el.classList.add("badge-red");
+          el.textContent = "异常";
+        } else {
+          el.classList.add("badge-gray");
+          el.textContent = "待检测";
+        }
+      }
+
+      function maskToken(token) {
+        if (!token) return "";
+        if (token.length <= 8) return "••••";
+        return token.slice(0, 4) + " •••• " + token.slice(token.length - 4);
+      }
+
+      // 页面展示用的密码掩码（导出仍然是明文）
+      function maskPasswordDisplay(pw) {
+        if (!pw) return "";
+        const len = pw.length;
+        const maskedLen = Math.max(4, Math.min(len, 12));
+        return "•".repeat(maskedLen);
+      }
+
+      function openDialog(id) {
+        $("#overlay").classList.add("show");
+        $(`#${id}`).classList.add("show");
+      }
+
+      function closeDialog(id) {
+        const dialog = $(`#${id}`);
+        if (dialog) dialog.classList.remove("show");
+        const anyOpen = $$(".dialog.show").length > 0;
+        if (!anyOpen) $("#overlay").classList.remove("show");
+      }
+
+      function refreshTokenHistoryUI() {
+        const ul = $("#tokenHistoryList");
+        ul.innerHTML = "";
+        if (!state.tokenHistory.length) {
+          const li = document.createElement("li");
+          li.className = "muted-sm";
+          li.textContent = "暂无历史记录，先生成一个 Token 试试吧。";
+          ul.appendChild(li);
+          return;
+        }
+        state.tokenHistory
+          .slice()
+          .sort((a, b) => b.time - a.time)
+          .forEach((item) => {
+            const li = document.createElement("li");
+            li.className = "token-history-item";
+            const dateStr = new Date(item.time).toLocaleString("zh-CN", {
+              hour12: false,
+            });
+            li.innerHTML = `
+              <div>
+                <div class="token-history-token">${maskToken(item.token)}</div>
+                <div class="token-history-meta">
+                  ${item.adminEmail || "未知邮箱"} · ${
+              item.apiBase || "未知域名"
+            }<br/>${dateStr}
+                </div>
+              </div>
+              <div>
+                <button class="btn btn-ghost btn-sm" data-history-use="${
+                  item.id
+                }">使用</button>
+              </div>
+            `;
+            ul.appendChild(li);
+          });
+      }
+
+      function renderRecords() {
+        const tbody = $("#recordTableBody");
+        tbody.innerHTML = "";
+        let list = state.records || [];
+        if (currentFilter === "success") {
+          list = list.filter((r) => r.status === "success");
+        } else if (currentFilter === "fail") {
+          list = list.filter((r) => r.status === "fail");
+        }
+
+        if (!list.length) {
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td colspan="6" style="text-align:center;padding:18px 8px"><span class="muted">暂无符合条件的记录</span></td>';
+          tbody.appendChild(tr);
+          return;
+        }
+
+        list
+          .slice()
+          .sort((a, b) => b.time - a.time)
+          .forEach((rec, idx) => {
+            const tr = document.createElement("tr");
+            const timeStr = new Date(rec.time).toLocaleString("zh-CN", {
+              hour12: false,
+            });
+            const statusClass =
+              rec.status === "success"
+                ? "status-ok"
+                : rec.status === "fail"
+                ? "status-fail"
+                : "status-pending";
+            const statusText =
+              rec.status === "success"
+                ? "成功"
+                : rec.status === "fail"
+                ? "失败"
+                : "待处理";
+
+            const displayPassword = maskPasswordDisplay(rec.password);
+
+            tr.innerHTML = `
+              <td>${idx + 1}</td>
+              <td>${htmlEsc(rec.email)}</td>
+              <td>
+                <span
+                  class="pw-text"
+                  data-real="${htmlEsc(rec.password || "")}"
+                  data-masked="${displayPassword}"
+                  data-showing="0"
+                >${displayPassword}</span>
+                <button
+                  class="icon-btn icon-btn-mini pw-eye-btn"
+                  type="button"
+                  title="查看/隐藏密码"
+                >👁</button>
+                <button
+                  class="icon-btn icon-btn-mini pw-copy-btn"
+                  type="button"
+                  title="复制账号+密码"
+                  data-email="${htmlEsc(rec.email || "")}"
+                  data-password="${htmlEsc(rec.password || "")}"
+                >📋</button>
+              </td>
+              <td><span class="status-tag ${statusClass}">${statusText}</span></td>
+              <td>${timeStr}</td>
+              <td>${htmlEsc(rec.message || "")}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+      }
+
+      // 当前用户名模式
+      function getUsernameMode() {
+        return (
+          document.querySelector('input[name="usernameMode"]:checked')?.value ||
+          "random"
+        );
+      }
+
+      // 根据规律模式自动同步数字长度（学号/递增：起始值长度；日期：可手动）
+      function syncPatternLengthUI() {
+        const inputNumLen = $("#inputNumberLength");
+        if (!inputNumLen) return;
+
+        const mode = getUsernameMode();
+        const numberMode =
+          document.querySelector('input[name="numberMode"]:checked')?.value ||
+          "random";
+        const patternType = $("#selectPatternType")?.value || "student";
+
+        // 只有在字母+数字 / 数字+字母 且 规律模式 时才锁定
+        if (mode === "random" || numberMode !== "pattern") {
+          inputNumLen.disabled = false;
+          inputNumLen.readOnly = false;
+          return;
+        }
+
+        if (patternType === "date") {
+          // 日期模式：长度由用户控制
+          inputNumLen.disabled = false;
+          inputNumLen.readOnly = false;
+        } else {
+          // 学号 / 递增：根据起始值位数自动识别并锁定
+          const start = $("#inputPatternStart")?.value.trim() || "";
+          let autoLen = start.length;
+          if (!autoLen) {
+            autoLen = Number(inputNumLen.value || 0) || 1;
+          }
+          inputNumLen.value = autoLen;
+          inputNumLen.disabled = true;
+          inputNumLen.readOnly = true;
+        }
+      }
+
+      // 根据模式控制数字模式区域显示/隐藏 & 选项
+      function syncNumberModeUI() {
+        const mode = getUsernameMode();
+        const group = $("#numberModeGroup");
+        const rowNumberLength = $("#rowNumberLength");
+        const rowPatternConfig = $("#rowPatternConfig");
+
+        const noneInput = document.querySelector(
+          '#numberModeGroup input[value="none"]'
+        );
+        const noneChip = noneInput && noneInput.parentElement;
+        const randomInput = document.querySelector(
+          '#numberModeGroup input[value="random"]'
+        );
+
+        if (mode === "random") {
+          // 完全随机：不需要数字模式，整块隐藏
+          if (group) group.style.display = "none";
+          if (rowNumberLength) rowNumberLength.style.display = "none";
+          if (rowPatternConfig) rowPatternConfig.style.display = "none";
+
+          // 恢复「无数字」选项并设为默认
+          if (noneChip && noneInput) {
+            noneChip.style.display = "";
+            $$("#numberModeGroup .chip").forEach((c) =>
+              c.classList.remove("active")
+            );
+            noneInput.checked = true;
+            noneChip.classList.add("active");
+          }
+
+          const inputNumLen = $("#inputNumberLength");
+          if (inputNumLen) {
+            inputNumLen.disabled = false;
+            inputNumLen.readOnly = false;
+          }
+          return;
+        }
+
+        // 字母+数字 / 数字+字母：需要数字模式
+        if (group) group.style.display = "";
+        if (rowNumberLength) rowNumberLength.style.display = "";
+
+        // 隐藏「无数字」选项，只保留 随机数字 / 规律模式
+        if (noneChip && noneInput) {
+          noneChip.style.display = "none";
+          if (noneInput.checked) {
+            noneInput.checked = false;
+          }
+          noneChip.classList.remove("active");
+        }
+
+        // 当前已选中的数字模式
+        let currentInput = document.querySelector(
+          'input[name="numberMode"]:checked'
+        );
+
+        // 如果没选中或仍是 none，则默认选中随机数字
+        if (!currentInput || currentInput.value === "none") {
+          if (randomInput) {
+            currentInput = randomInput;
+            randomInput.checked = true;
+          }
+        }
+
+        // 刷新 chip 高亮
+        $$("#numberModeGroup .chip").forEach((chip) => {
+          const input = chip.querySelector('input[name="numberMode"]');
+          if (input && input.checked) chip.classList.add("active");
+          else chip.classList.remove("active");
+        });
+
+        const numberMode = currentInput ? currentInput.value : "random";
+
+        // 只有规律模式展示配置行
+        if (rowPatternConfig) {
+          rowPatternConfig.style.display = numberMode === "pattern" ? "" : "none";
+        }
+
+        // 同步数字长度的自动/可编辑状态
+        syncPatternLengthUI();
+      }
+
+      function getCurrentNumberLength() {
+        const mode = getUsernameMode();
+        if (mode === "random") return 0;
+
+        const numberMode =
+          document.querySelector('input[name="numberMode"]:checked')?.value ||
+          "random";
+        const patternType = $("#selectPatternType")?.value || "student";
+
+        if (numberMode === "random") {
+          return Number($("#inputNumberLength").value || 0) || 0;
+        }
+
+        if (numberMode === "pattern") {
+          if (patternType === "date") {
+            return Number($("#inputNumberLength").value || 0) || 0;
+          }
+          const start = $("#inputPatternStart")?.value.trim() || "";
+          if (start) return start.length;
+          return Number($("#inputNumberLength").value || 0) || 0;
+        }
+
+        return 0;
+      }
+
+      function updateUsernamePreview() {
+        const baseLen = Number($("#inputBaseLength").value || 0);
+        const mode = getUsernameMode();
+
+        // 完全随机：只有基础长度
+        if (mode === "random") {
+          $("#usernamePreview").textContent = `总长度预览：${baseLen} 位（不含前缀与 @域名）`;
+          return;
+        }
+
+        const numLen = getCurrentNumberLength();
+        const total = baseLen + (Number.isFinite(numLen) ? numLen : 0);
+
+        $("#usernamePreview").textContent = `预览：字母 ${baseLen} 位 + 数字 ${numLen} 位 ≈ 总 ${total} 位（不含前缀与 @域名）`;
+      }
+
+      function collectCheckedValues(groupSelector) {
+        return $$(groupSelector + " input:checked").map((el) => el.value);
+      }
+
+      function randomFrom(chars) {
+        if (!chars.length) return "";
+        const idx = Math.floor(Math.random() * chars.length);
+        return chars[idx];
+      }
+
+      function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function buildCharSet(selected) {
+        const sets = {
+          upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+          lower: "abcdefghijklmnopqrstuvwxyz",
+          digit: "0123456789",
+          symbol: "!@#$%^&*",
+        };
+        let result = "";
+        selected.forEach((key) => {
+          if (sets[key]) result += sets[key];
+        });
+        if (!result) {
+          result = sets.upper + sets.lower + sets.digit;
+        }
+        return result;
+      }
+
+      function generatePassword() {
+        const length =
+          Number(
+            document.querySelector('input[name="passwordLength"]:checked')
+              ?.value || 10
+          ) || 10;
+        const selected = collectCheckedValues("#passwordCharsetGroup");
+        const sets = {
+          upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+          lower: "abcdefghijklmnopqrstuvwxyz",
+          digit: "0123456789",
+          symbol: "!@#$%^&*",
+        };
+        let allChars = "";
+        const mandatoryChars = [];
+        selected.forEach((key) => {
+          if (sets[key]) {
+            allChars += sets[key];
+            mandatoryChars.push(randomFrom(sets[key]));
+          }
+        });
+        if (!allChars) {
+          allChars = sets.upper + sets.lower + sets.digit;
+        }
+        const chars = mandatoryChars.slice(
+          0,
+          Math.min(length, mandatoryChars.length)
+        );
+        while (chars.length < length) {
+          chars.push(randomFrom(allChars));
+        }
+        shuffleArray(chars);
+        return chars.join("");
+      }
+
+      function generateUsername(index) {
+        const prefix = $("#inputUsernamePrefix").value.trim();
+        const baseLen = Math.max(1, Number($("#inputBaseLength").value || 1));
+        const mode = getUsernameMode();
+        const numberModeRaw =
+          document.querySelector('input[name="numberMode"]:checked')?.value ||
+          "random";
+        const usernameChars = buildCharSet(
+          collectCheckedValues("#usernameCharsetGroup")
+        );
+
+        // 字母部分长度 = 基础长度
+        let basePart = "";
+        for (let i = 0; i < baseLen; i++) {
+          basePart += randomFrom(usernameChars);
+        }
+
+        // 完全随机：不单独生成数字段
+        if (mode === "random") {
+          return prefix + basePart;
+        }
+
+        // 字母+数字 / 数字+字母：数字部分单独处理
+        let numberMode = numberModeRaw;
+        if (numberMode !== "random" && numberMode !== "pattern") {
+          numberMode = "random";
+        }
+
+        let numLen = getCurrentNumberLength();
+        if ((numberMode === "random" || numberMode === "pattern") && numLen <= 0) {
+          numLen = 1;
+        }
+
+        let numPart = "";
+        if (numberMode === "random") {
+          const digits = "0123456789";
+          for (let i = 0; i < numLen; i++) {
+            numPart += randomFrom(digits);
+          }
+        } else if (numberMode === "pattern") {
+          const patternType = $("#selectPatternType").value;
+          const start = $("#inputPatternStart").value.trim();
+          if (patternType === "date") {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            const base = `${y}${m}${dd}`;
+            numPart =
+              numLen >= base.length
+                ? base.padStart(numLen, "0")
+                : base.slice(-numLen);
+          } else {
+            const baseVal = parseInt(start || "0", 10) || 0;
+            const value = baseVal + index;
+            let s = String(value);
+            const targetLen = Math.max(start.length || 0, numLen);
+            if (targetLen > 0) s = s.padStart(targetLen, "0");
+            numPart =
+              numLen && numLen < s.length ? s.slice(-numLen) : s;
+          }
+        }
+
+        let core = "";
+        if (mode === "letter-digit") {
+          core = basePart + numPart;
+        } else if (mode === "digit-letter") {
+          core = numPart + basePart;
+        } else {
+          core = basePart;
+        }
+
+        return prefix + core;
+      }
+
+      function buildEmail(username) {
+        let domain = $("#inputDomain").value.trim();
+        if (!domain) return "";
+        if (!domain.startsWith("@")) {
+          domain = "@" + domain;
+        }
+        return username + domain;
+      }
+
+      function normalizeBase(url) {
+        let u = url.trim();
+        if (!u) return "";
+        if (u.endsWith("/")) u = u.slice(0, -1);
+        return u;
+      }
+
+      async function apiGenToken() {
+        const apiBase = normalizeBase($("#inputApiBase").value);
+        const email = $("#inputAdminEmail").value.trim();
+        const password = $("#inputAdminPassword").value;
+        if (!apiBase || !email || !password) {
+          showToast("error", "请完整填写 API 域名、管理员邮箱与密码");
+          return;
+        }
+        try {
+          running = true;
+          $("#btnGenToken").disabled = true;
+          addLog("正在请求生成 Token ...", "system");
+          const res = await fetch(apiBase + "/api/public/genToken", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
+          if (res.ok && data && data.code === 200 && data.data?.token) {
+            const token = data.data.token;
+            state.apiBase = apiBase;
+            state.token = token;
+            state.adminEmail = email;
+            $("#inputApiBase").value = apiBase;
+            $("#inputToken").value = token;
+            $("#inputAdminEmail").value = email;
+            addLog("Token 生成成功", "success");
+            showToast("success", "Token 已生成并保存到本地");
+            updateApiStatus(true);
+
+            state.tokenHistory.push({
+              id: Date.now(),
+              token,
+              apiBase,
+              adminEmail: email,
+              time: Date.now(),
+            });
+            if (state.tokenHistory.length > 20) {
+              state.tokenHistory = state.tokenHistory.slice(-20);
+            }
+            refreshTokenHistoryUI();
+            saveState();
+          } else {
+            const msg = data?.message || "未知错误";
+            addLog(`Token 生成失败：${msg}`, "error");
+            showToast("error", "Token 生成失败：" + msg);
+            updateApiStatus(false);
+          }
+        } catch (e) {
+          console.error(e);
+          addLog("Token 生成异常：" + e.message, "error");
+          showToast("error", "网络或跨域异常，查看控制台详情");
+          updateApiStatus(false);
+        } finally {
+          $("#btnGenToken").disabled = false;
+          running = false;
+        }
+      }
+
+      async function apiAddUser(user) {
+        const apiBase = normalizeBase($("#inputApiBase").value || state.apiBase);
+        const token = $("#inputToken").value.trim() || state.token;
+        if (!apiBase || !token) {
+          throw new Error("尚未配置 API 域名或 Token");
+        }
+        const url = apiBase + "/api/public/addUser";
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify({ list: [user] }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data || data.code !== 200) {
+          const msg = data?.message || `HTTP ${res.status}`;
+          const err = new Error(msg);
+          err.code = data?.code || res.status;
+          throw err;
+        }
+        return data;
+      }
+
+      async function checkApiConnectivity() {
+        const apiBase = normalizeBase($("#inputApiBase").value || state.apiBase);
+        const token = $("#inputToken").value.trim() || state.token;
+
+        if (!apiBase) {
+          showToast("error", "请先配置 API 域名");
+          addLog("API 联通检测失败：未配置 API 域名", "error");
+          return;
+        }
+
+        const btn = $("#btnCheckApi");
+        try {
+          if (btn) btn.disabled = true;
+          addLog("正在检测 API 联通性 ...", "system");
+
+          const url = apiBase + "/api/public/emailList";
+          const headers = { "Content-Type": "application/json" };
+          if (token) {
+            headers.Authorization = token;
+          }
+          const payload = { num: 1, size: 1 };
+
+          const res = await fetch(url, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(payload),
+          });
+
+          let data = {};
+          try {
+            data = await res.json();
+          } catch (_) {
+            data = {};
+          }
+
+          if (res.ok && data && data.code === 200) {
+            updateApiStatus(true);
+            showToast("success", "API 联通正常");
+            addLog("API 联通检测成功", "success");
+          } else {
+            let msg =
+              (data && (data.message || data.msg)) || `HTTP ${res.status}`;
+            if (res.status === 401 || res.status === 403) {
+              msg = `API 可访问，但 Token 无效（${msg}）`;
+            } else {
+              msg = `API 可访问，但返回异常（${msg}）`;
+            }
+            updateApiStatus(false);
+            showToast("error", msg);
+            addLog("API 联通检测返回异常：" + msg, "error");
+          }
+        } catch (e) {
+          console.error(e);
+          updateApiStatus(false);
+          showToast("error", "无法连接 API：" + e.message);
+          addLog("API 联通检测失败：" + e.message, "error");
+        } finally {
+          if (btn) btn.disabled = false;
+        }
+      }
+
+      async function apiEmailList() {
+        const apiBase = normalizeBase($("#inputApiBase").value || state.apiBase);
+        const token = $("#inputToken").value.trim() || state.token;
+        if (!apiBase || !token) {
+          showToast("error", "请先配置 API 域名与 Token");
+          return;
+        }
+        const payload = {
+          toEmail: $("#inputToEmail").value.trim() || undefined,
+          sendEmail: $("#inputSendEmail").value.trim() || undefined,
+          subject: $("#inputSubject").value.trim() || undefined,
+          timeSort: $("#selectTimeSort").value || undefined,
+          type: $("#selectEmailType").value || undefined,
+          isDel: $("#selectIsDel").value || undefined,
+          num: Number($("#inputPageNum").value || 1) || 1,
+          size: Number($("#inputPageSize").value || 20) || 20,
+        };
+        try {
+          $("#btnQueryEmail").disabled = true;
+          addLog("正在查询邮件列表 ...", "system");
+          const res = await fetch(apiBase + "/api/public/emailList", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          if (res.ok && data && data.code === 200 && Array.isArray(data.data)) {
+            emailCache = data.data;
+            renderEmailList();
+            showToast("success", `查询成功，共 ${data.data.length} 条`);
+            addLog(`邮件查询成功，返回 ${data.data.length} 条`, "success");
+            updateApiStatus(true);
+          } else {
+            const msg = data?.message || "未知错误";
+            showToast("error", "邮件查询失败：" + msg);
+            addLog("邮件查询失败：" + msg, "error");
+            updateApiStatus(false);
+          }
+        } catch (e) {
+          console.error(e);
+          showToast("error", "邮件查询异常：" + e.message);
+          addLog("邮件查询异常：" + e.message, "error");
+          updateApiStatus(false);
+        } finally {
+          $("#btnQueryEmail").disabled = false;
+        }
+      }
+
+      function renderEmailList() {
+        const tbody = $("#emailTableBody");
+        tbody.innerHTML = "";
+        if (!emailCache.length) {
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td colspan="7" style="text-align:center;padding:16px 8px"><span class="muted">暂无数据</span></td>';
+          tbody.appendChild(tr);
+          return;
+        }
+        emailCache.forEach((item, idx) => {
+          const tr = document.createElement("tr");
+          const typeText = item.type === 1 ? "发件" : "收件";
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td><span class="badge-type">${typeText}</span></td>
+            <td>${
+              item.sendName
+                ? htmlEsc(item.sendName) +
+                  " &lt;" +
+                  htmlEsc(item.sendEmail) +
+                  "&gt;"
+                : htmlEsc(item.sendEmail || "")
+            }</td>
+            <td>${
+              item.toName
+                ? htmlEsc(item.toName) +
+                  " &lt;" +
+                  htmlEsc(item.toEmail) +
+                  "&gt;"
+                : htmlEsc(item.toEmail || "")
+            }</td>
+            <td>${htmlEsc(item.subject || "")}</td>
+            <td>${htmlEsc(item.createTime || "")}</td>
+            <td><button class="btn btn-ghost btn-sm" data-email-index="${idx}">查看</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function openEmailDetail(index) {
+        const item = emailCache[index];
+        if (!item) return;
+        const container = $("#emailDetailContent");
+        const typeText = item.type === 1 ? "发件" : "收件";
+        const htmlEscLocal = (str) =>
+          (str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        container.innerHTML = `
+          <div class="email-detail-row">
+            <span class="label">类型</span>
+            <span class="badge-type">${typeText}</span>
+          </div>
+          <div class="email-detail-row">
+            <span class="label">发件人</span>
+            <span>${htmlEscLocal(item.sendName || "")} ${
+          item.sendEmail
+            ? "&lt;" + htmlEscLocal(item.sendEmail) + "&gt;"
+            : ""
+        }</span>
+          </div>
+          <div class="email-detail-row">
+            <span class="label">收件人</span>
+            <span>${htmlEscLocal(item.toName || "")} ${
+          item.toEmail ? "&lt;" + htmlEscLocal(item.toEmail) + "&gt;" : ""
+        }</span>
+          </div>
+          <div class="email-detail-row">
+            <span class="label">时间</span>
+            <span>${htmlEscLocal(item.createTime || "")}</span>
+          </div>
+          <div class="email-detail-row">
+            <span class="label">主题</span>
+            <span>${htmlEscLocal(item.subject || "")}</span>
+          </div>
+          <div class="email-detail-row">
+            <span class="label">文本</span>
+            <span>${htmlEscLocal(item.text || "")}</span>
+          </div>
+          <div class="email-body-viewer" style="margin-top:8px">
+            <iframe srcdoc="${(item.content || "").replace(
+              /"/g,
+              "&quot;"
+            )}"></iframe>
+          </div>
+        `;
+        openDialog("dialogEmailDetail");
+      }
+
+      async function startRegister() {
+        if (running) return;
+        const apiBase = normalizeBase($("#inputApiBase").value || state.apiBase);
+        const token = $("#inputToken").value.trim() || state.token;
+        if (!apiBase || !token) {
+          showToast("error", "请先配置 API 域名与 Token");
+          addLog("开始注册前检查失败：未配置 API 或 Token", "error");
+          return;
+        }
+
+        const count = Math.max(
+          1,
+          Math.min(100, Number($("#inputCount").value || 0))
+        );
+        $("#inputCount").value = count;
+        const domain = $("#inputDomain").value.trim();
+        if (!domain) {
+          showToast("error", "请填写邮箱域名");
+          return;
+        }
+
+        updateUsernamePreview();
+
+        running = true;
+        $("#btnStartRegister").disabled = true;
+        $("#btnResetSettings").disabled = true;
+        updateApiStatus();
+
+        const roleName = $("#inputRoleName").value.trim() || undefined;
+
+        addLog(`开始批量注册，共 ${count} 个账号`, "system");
+        $("#progressStatus").textContent = "正在生成用户名和密码 ...";
+
+        const tasks = [];
+        for (let i = 0; i < count; i++) {
+          const username = generateUsername(i);
+          const email = buildEmail(username);
+          const password = generatePassword();
+          tasks.push({ email, password, roleName });
+        }
+
+        let successCount = 0;
+        let failCount = 0;
+        let processed = 0;
+        const total = tasks.length;
+        const startTime = Date.now();
+
+        for (const task of tasks) {
+          processed++;
+          const percent = Math.round((processed / total) * 100);
+          $("#progressText").textContent = `${processed} / ${total} · ${percent}%`;
+          $("#progressBar").style.width = `${percent}%`;
+          $("#progressStatus").textContent = `第 ${processed}/${total} 个：${
+            task.email
+          }`;
+
+          const record = {
+            email: task.email,
+            password: task.password,
+            roleName: task.roleName,
+            status: "pending",
+            message: "",
+            time: Date.now(),
+          };
+
+          try {
+            await apiAddUser({
+              email: task.email,
+              password: task.password,
+              roleName: task.roleName,
+            });
+            record.status = "success";
+            record.message = "";
+            successCount++;
+            addLog(`注册成功：${task.email}`, "success");
+          } catch (e) {
+            record.status = "fail";
+            record.message = e.message || "未知错误";
+            failCount++;
+            addLog(`注册失败：${task.email} · ${e.message}`, "error");
+            updateApiStatus(false);
+          }
+          state.records.push(record);
+          if (state.records.length > 500) {
+            state.records = state.records.slice(-500);
+          }
+          renderRecords();
+          saveState();
+        }
+
+        const duration = Math.round((Date.now() - startTime) / 1000);
+        const summary = `批量注册完成：成功 ${successCount} 个，失败 ${failCount} 个，用时 ${duration} 秒`;
+        $("#progressStatus").textContent = summary;
+        showToast(failCount ? "info" : "success", summary);
+        addLog(summary, failCount ? "system" : "success");
+
+        state.stats.today += successCount;
+        state.stats.total += successCount;
+        state.stats.success += successCount;
+        state.stats.fail += failCount;
+        updateStats();
+        updateApiStatus(failCount === 0);
+        saveState();
+
+        running = false;
+        $("#btnStartRegister").disabled = false;
+        $("#btnResetSettings").disabled = false;
+      }
+
+      function exportRecords() {
+        if (!state.records.length) {
+          showToast("info", "暂无可导出的记录");
+          return;
+        }
+        const header = ["序号", "邮箱地址", "密码", "状态", "时间", "备注"];
+        const lines = state.records
+          .slice()
+          .sort((a, b) => a.time - b.time)
+          .map((rec, idx) => {
+            const status =
+              rec.status === "success"
+                ? "成功"
+                : rec.status === "fail"
+                ? "失败"
+                : "待处理";
+            const timeStr = new Date(rec.time).toLocaleString("zh-CN", {
+              hour12: false,
+            });
+            // 导出时使用明文密码 rec.password
+            return [
+              String(idx + 1),
+              rec.email || "",
+              rec.password || "",
+              status,
+              timeStr,
+              rec.message || "",
+            ];
+          });
+
+        const escapeCsv = (value) =>
+          `"${String(value || "").replace(/"/g, '""')}"`;
+        let csv = header.map(escapeCsv).join(",") + "\n";
+        csv += lines.map((row) => row.map(escapeCsv).join(",")).join("\n");
+
+        const blob = new Blob(["\uFEFF" + csv], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `注册结果_${todayStr()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("success", "CSV 导出完成");
+      }
+
+      function clearRecordsConfirm() {
+        openDialog("dialogConfirmClear");
+      }
+
+      function clearRecords() {
+        state.records = [];
+        renderRecords();
+        saveState();
+        addLog("已清空本地注册记录", "system");
+        showToast("info", "已清空本地记录");
+      }
+
+      function clearLog() {
+        $("#logList").innerHTML = "";
+        $("#logCountBadge").textContent = "0 条";
+      }
+
+      function clearTokenHistory() {
+        state.tokenHistory = [];
+        refreshTokenHistoryUI();
+        saveState();
+        addLog("已清空 Token 历史记录", "system");
+        showToast("info", "Token 历史已清空");
+      }
+
+      // ✅ 复制函数：优先 navigator.clipboard，失败自动降级 execCommand
+      async function copyTextToClipboard(text) {
+        const legacyCopy = () => {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+
+          ta.focus();
+          ta.select();
+
+          try {
+            const ok = document.execCommand("copy");
+            document.body.removeChild(ta);
+            if (!ok) {
+              throw new Error("execCommand copy 返回 false");
+            }
+            return true;
+          } catch (err) {
+            document.body.removeChild(ta);
+            return false;
+          }
+        };
+
+        // ① 优先使用现代剪贴板 API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          try {
+            await navigator.clipboard.writeText(text);
+            showToast("success", "已复制账号+密码");
+            return;
+          } catch (e) {
+            console.warn("navigator.clipboard 失败，降级到 execCommand：", e);
+          }
+        }
+
+        // ② 降级旧方案
+        const ok = legacyCopy();
+        if (ok) {
+          showToast("success", "已复制账号+密码");
+          return;
+        }
+
+        // ③ 两种方式都失败
+        showToast("error", "复制失败，请手动长按选择复制");
+      }
+
+      function setupEvents() {
+        // Token 显示 / 清空
+        $("#btnToggleToken").addEventListener("click", () => {
+          const input = $("#inputToken");
+          input.type = input.type === "password" ? "text" : "password";
+        });
+        $("#btnClearToken").addEventListener("click", () => {
+          $("#inputToken").value = "";
+          state.token = "";
+          saveState();
+          updateApiStatus();
+        });
+
+        // 生成 Token
+        $("#btnGenToken").addEventListener("click", apiGenToken);
+
+        // Token 历史弹窗
+        $("#btnTokenHistory").addEventListener("click", () => {
+          refreshTokenHistoryUI();
+          openDialog("dialogTokenHistory");
+        });
+
+        // overlay & 通用关闭
+        $$("#overlay, [data-dialog-close]").forEach((el) => {
+          el.addEventListener("click", () => {
+            const id = el.dataset.dialogClose;
+            if (id) {
+              closeDialog(id);
+            } else {
+              [
+                "dialogTokenHistory",
+                "dialogConfirmClear",
+                "dialogEmailDetail",
+              ].forEach((d) => closeDialog(d));
+            }
+          });
+        });
+
+        // Token 历史使用 / 清空
+        $("#tokenHistoryList").addEventListener("click", (e) => {
+          const id = e.target.dataset.historyUse;
+          if (!id) return;
+          const item = state.tokenHistory.find((x) => String(x.id) === String(id));
+          if (!item) return;
+          state.apiBase = item.apiBase || state.apiBase;
+          state.token = item.token;
+          state.adminEmail = item.adminEmail || state.adminEmail;
+          $("#inputApiBase").value = state.apiBase;
+          $("#inputToken").value = state.token;
+          $("#inputAdminEmail").value = state.adminEmail || "";
+          saveState();
+          updateApiStatus();
+          addLog("已从历史记录加载 Token", "system");
+          showToast("success", "已应用该 Token");
+          closeDialog("dialogTokenHistory");
+        });
+        $("#btnClearTokenHistory").addEventListener("click", clearTokenHistory);
+
+        // 用户名模式
+        $$("#usernameModeGroup .chip input").forEach((input) => {
+          input.addEventListener("change", () => {
+            $$("#usernameModeGroup .chip").forEach((c) =>
+              c.classList.remove("active")
+            );
+            input.parentElement.classList.add("active");
+
+            syncNumberModeUI();
+            updateUsernamePreview();
+          });
+        });
+
+        // 数字模式
+        $$("#numberModeGroup .chip input").forEach((input) => {
+          input.addEventListener("change", () => {
+            $$("#numberModeGroup .chip").forEach((c) =>
+              c.classList.remove("active")
+            );
+            input.parentElement.classList.add("active");
+
+            syncNumberModeUI();
+            updateUsernamePreview();
+          });
+        });
+
+        // 规律模式类型、起始值变化时，同步长度 & 预览
+        const selPatternType = $("#selectPatternType");
+        if (selPatternType) {
+          selPatternType.addEventListener("change", () => {
+            syncPatternLengthUI();
+            updateUsernamePreview();
+          });
+        }
+        const inputPatternStart = $("#inputPatternStart");
+        if (inputPatternStart) {
+          inputPatternStart.addEventListener("input", () => {
+            syncPatternLengthUI();
+            updateUsernamePreview();
+          });
+        }
+
+        $("#inputBaseLength").addEventListener("input", () => {
+          updateUsernamePreview();
+        });
+        $("#inputNumberLength").addEventListener("input", () => {
+          updateUsernamePreview();
+        });
+
+        // 密码长度选项
+        $$("#passwordLengthGroup .chip input").forEach((input) => {
+          input.addEventListener("change", () => {
+            $$("#passwordLengthGroup .chip").forEach((c) =>
+              c.classList.remove("active")
+            );
+            input.parentElement.classList.add("active");
+          });
+        });
+
+        // Charset 选项高亮
+        [
+          "#usernameCharsetGroup .chip input",
+          "#passwordCharsetGroup .chip input",
+        ].forEach((selector) => {
+          $$(selector).forEach((input) => {
+            input.addEventListener("change", () => {
+              if (input.checked) input.parentElement.classList.add("active");
+              else input.parentElement.classList.remove("active");
+            });
+          });
+        });
+
+        // 开始注册 / 重置
+        $("#btnStartRegister").addEventListener("click", startRegister);
+        $("#btnResetSettings").addEventListener("click", () => {
+          $("#inputCount").value = 10;
+          $("#inputDomain").value = "";
+          $("#inputUsernamePrefix").value = "";
+          $("#inputBaseLength").value = 6;
+          document.querySelector(
+            'input[name="usernameMode"][value="random"]'
+          ).checked = true;
+          $$("#usernameModeGroup .chip").forEach((c) =>
+            c.classList.remove("active")
+          );
+          document
+            .querySelector(
+              '#usernameModeGroup input[name="usernameMode"][value="random"]'
+            )
+            .parentElement.classList.add("active");
+          document.querySelector(
+            'input[name="numberMode"][value="none"]'
+          ).checked = true;
+          $$("#numberModeGroup .chip").forEach((c) =>
+            c.classList.remove("active")
+          );
+          document
+            .querySelector(
+              '#numberModeGroup input[name="numberMode"][value="none"]'
+            )
+            .parentElement.classList.add("active");
+          $("#rowNumberLength").style.display = "none";
+          $("#rowPatternConfig").style.display = "none";
+          $("#inputNumberLength").value = 3;
+          $("#selectPatternType").value = "student";
+          $("#inputPatternStart").value = "";
+
+          // 用户名字符类型
+          $$("#usernameCharsetGroup input").forEach((input) => {
+            input.checked = ["upper", "lower", "digit"].includes(input.value);
+            if (input.checked) input.parentElement.classList.add("active");
+            else input.parentElement.classList.remove("active");
+          });
+
+          // 密码长度
+          document.querySelector(
+            '#passwordLengthGroup input[name="passwordLength"][value="10"]'
+          ).checked = true;
+          $$("#passwordLengthGroup .chip").forEach((c) =>
+            c.classList.remove("active")
+          );
+          document
+            .querySelector(
+              '#passwordLengthGroup input[name="passwordLength"][value="10"]'
+            )
+            .parentElement.classList.add("active");
+
+          // 密码字符类型
+          $$("#passwordCharsetGroup input").forEach((input) => {
+            input.checked = ["upper", "lower", "digit"].includes(input.value);
+            if (input.checked) input.parentElement.classList.add("active");
+            else input.parentElement.classList.remove("active");
+          });
+
+          $("#inputRoleName").value = "";
+          syncNumberModeUI();
+          updateUsernamePreview();
+          showToast("info", "注册配置已恢复默认");
+        });
+
+        // 结果过滤
+        $("#resultFilterGroup").addEventListener("click", (e) => {
+          const btn = e.target.closest(".pill-filter");
+          if (!btn) return;
+          $$("#resultFilterGroup .pill-filter").forEach((b) =>
+            b.classList.remove("active")
+          );
+          btn.classList.add("active");
+          currentFilter = btn.dataset.filter || "all";
+          renderRecords();
+        });
+
+        // 密码查看 / 单条复制账号密码（事件代理）
+        $("#recordTableBody").addEventListener("click", (e) => {
+          const eyeBtn = e.target.closest(".pw-eye-btn");
+          if (eyeBtn) {
+            const cell = eyeBtn.closest("td");
+            const span = cell && cell.querySelector(".pw-text");
+            if (!span) return;
+            const showing = span.dataset.showing === "1";
+            if (showing) {
+              span.textContent =
+                span.dataset.masked ||
+                maskPasswordDisplay(span.dataset.real || "");
+              span.dataset.showing = "0";
+            } else {
+              span.textContent = span.dataset.real || "";
+              span.dataset.showing = "1";
+            }
+            return;
+          }
+          const copyBtn = e.target.closest(".pw-copy-btn");
+          if (copyBtn) {
+            const email = copyBtn.dataset.email || "";
+            const password = copyBtn.dataset.password || "";
+            const text =
+              email && password ? `${email}\t${password}` : email || password;
+            if (text) {
+              copyTextToClipboard(text);
+            }
+          }
+        });
+
+        // 导出 / 清空记录
+        $("#btnExportRecords").addEventListener("click", exportRecords);
+        $("#btnClearRecords").addEventListener("click", clearRecordsConfirm);
+        $("#btnConfirmClearRecords").addEventListener("click", () => {
+          clearRecords();
+          closeDialog("dialogConfirmClear");
+        });
+
+        // 清空日志
+        $("#btnClearLog").addEventListener("click", clearLog);
+
+        // 邮件查询
+        $("#btnQueryEmail").addEventListener("click", apiEmailList);
+        $("#emailTableBody").addEventListener("click", (e) => {
+          const idx = e.target.dataset.emailIndex;
+          if (idx === undefined) return;
+          openEmailDetail(Number(idx));
+        });
+
+        // API 联通检测
+        const btnCheck = $("#btnCheckApi");
+        if (btnCheck) {
+          btnCheck.addEventListener("click", checkApiConnectivity);
+        }
+
+        // API 配置 blur 保存
+        $("#inputApiBase").addEventListener("blur", () => {
+          state.apiBase = normalizeBase($("#inputApiBase").value);
+          $("#inputApiBase").value = state.apiBase;
+          saveState();
+          updateApiStatus();
+        });
+        $("#inputToken").addEventListener("blur", () => {
+          state.token = $("#inputToken").value.trim();
+          saveState();
+          updateApiStatus();
+        });
+        $("#inputAdminEmail").addEventListener("blur", () => {
+          state.adminEmail = $("#inputAdminEmail").value.trim();
+          saveState();
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        setupEvents();
+        loadState();
+      });
+    })();
+  </script>
+</body>
+</html>
