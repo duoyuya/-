@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>种子转磁力链接 (精准版)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f0f2f5; }
+        .container { background-color: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); text-align: center; width: 90%; max-width: 500px; }
+        h1 { margin-top: 0; color: #333; font-size: 1.5rem; }
+        .upload-btn { background-color: #007bff; color: white; padding: 12px 24px; border-radius: 6px; cursor: pointer; display: inline-block; transition: background 0.2s; }
+        .upload-btn:hover { background-color: #0056b3; }
+        input[type="file"] { display: none; }
+        #result { margin-top: 20px; display: none; }
+        textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; font-family: monospace; background: #f8f9fa; resize: vertical; min-height: 80px; }
+        .copy-btn { margin-top: 10px; background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+        .copy-btn:hover { background: #218838; }
+        .error { color: #dc3545; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌱 种子转磁力链接 (精准版)</h1>
+    <p style="color:#666; font-size: 0.9rem;">采用二进制切片技术，确保 Hash 准确</p>
+    
+    <label class="upload-btn">
+        选择 .torrent 文件
+        <input type="file" id="fileInput" accept=".torrent">
+    </label>
+
+    <div id="error" class="error"></div>
+
+    <div id="result">
+        <p>磁力链接：</p>
+        <textarea id="magnetText" readonly></textarea>
+        <button class="copy-btn" onclick="copyLink()">复制链接</button>
+    </div>
+</div>
+
+<script>
+/**
+ * 核心逻辑：
+ * 1. 解析 Bencode 结构以找到 'info' 键的位置。
+ * 2. 记录 'info' 值的起始字节偏移量和结束字节偏移量。
+ * 3. 直接从原始 ArrayBuffer 中切片。
+ * 4. 对切片进行 SHA-1 计算。
+ */
+
+const fileInput = document.getElementById('fileInput');
+const resultDiv = document.getElementById('result');
+const magnetText = document.getElementById('magnetText');
+const errorDiv = document.getElementById('error');
+
+fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    errorDiv.style.display = 'none';
+    resultDiv.style.display = 'none';
+
+    try {
+        const buffer = await file.arrayBuffer();
+        // 使用严谨的二进制查找器
+        const infoHash = await getStrictInfoHash(buffer);
+        
+        const magnet = `magnet:?xt=urn:btih:${infoHash}`;
+        magnetText.value = magnet;
+        resultDiv.style.display = 'block';
+    } catch (err) {
+        console.error(err);
+        errorDiv.textContent = "解析失败: " + err.message;
+        errorDiv.style.display = 'block';
+    }
+});
+
+// --- 核心工具：Bencode 二进制查找器 ---
+
+function findInfoRange(buffer) {
+    const data = new Uint8Array(buffer);
+    let pos = 0;
+    
+    // 寻找 'info' 键
+    // 在 Bencode 中，字典以 'd' 开头。
+    // 我们需要遍历字典直到找到 key 为 'info' 的部分。
+    
+    // 这是一个简化的查找器，假设标准 torrent 结构
+    // 实际上我们需要一个能跳过任意值的解析器
+    
+    function readString() {
+        let lenStr = '';
+        while (data[pos] !== 58) { // ':'
+            lenStr += String.fromCharCode(data[pos]);
+            pos++;
+        }
+        pos++; // skip ':'
+        const len = parseInt(lenStr);
+        const start = pos;
+        pos += len;
+        return { val: String.fromCharCode(...data.slice(start, pos)), start: start, end: pos };
+    }
+
+    function skipValue() {
+        const char = data[pos];
+        if (char === 105) { // 'i' integer
+            pos++;
+            while (data[pos] !== 101) pos++; // skip to 'e'
+            pos++;
+        } else if (char === 108) { // 'l' list
+            pos++;
+            while (data[pos] !== 101) skipValue(); // recursive skip
+            pos++;
+        } else if (char === 100) { // 'd' dict
+            pos++;
+            while (data[pos] !== 101) {
+                readString(); // read key
+                skipValue();  // skip value
+            }
+            pos++;
+        } else if (/\d/.test(String.fromCharCode(char))) { // string
+            const strObj = readString();
+            return strObj; // return string info if needed
+        }
+        return null;
+    }
+
+    // 开始解析根字典
+    if (data[pos] !== 100) throw new Error("Not a valid Bencode dictionary");
+    pos++; // skip 'd'
+
+    let infoStart = -1;
+    let infoEnd = -1;
+
+    // 遍历根字典的键值对
+    while (data[pos] !== 101) { // 'e'
+        const keyObj = readString();
+        if (keyObj.val === 'info') {
+            infoStart = pos; // info 值的起始位置
+            // 我们需要解析完 info 内部结构才能知道结束位置
+            // 但我们可以先记下当前位置，然后让 skipValue 跑完它
+            skipValue(); 
+            infoEnd = pos; // info 值的结束位置
+            break;
+        } else {
+            skipValue(); // 跳过非 info 的键值对
+        }
+    }
+
+    if (infoStart === -1) throw new Error("No 'info' key found");
+    return { start: infoStart, end: infoEnd };
+}
+
+async function getStrictInfoHash(buffer) {
+    // 1. 找到 info 字段在二进制流中的确切范围
+    const range = findInfoRange(buffer);
+    
+    // 2. 切片（这是最关键的一步，必须用原始字节）
+    const infoBuffer = buffer.slice(range.start, range.end);
+    
+    // 3. 计算 SHA-1
+    const hashBuffer = await crypto.subtle.digest('SHA-1', infoBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    
+    // 4. 转 Hex
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function copyLink() {
+    magnetText.select();
+    document.execCommand('copy');
+    alert('已复制到剪贴板');
+}
+</script>
+
+</body>
+</html>
